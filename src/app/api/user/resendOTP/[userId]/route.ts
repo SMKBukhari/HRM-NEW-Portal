@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { compileOTPMail, sendMail } from "@/lib/emails/mail";
@@ -7,13 +8,13 @@ export const PATCH = async (
   req: Request,
   { params }: { params: { userId: string } }
 ) => {
-  const { userId } = params;
+  const { userId } = await params;
 
   if (!userId) {
     return new NextResponse("Unauthorized", { status: 400 });
   }
 
-  const user = await db.userProfile.findUnique({
+  const user = await prisma.userProfile.findUnique({
     where: {
       userId: userId,
     },
@@ -27,7 +28,7 @@ export const PATCH = async (
   const otpCode = crypto.randomInt(100000, 999999).toString();
   const otpCodeExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-  await db.userProfile.update({
+  await prisma.userProfile.update({
     where: { userId: user.userId },
     data: { otpCode, otpCodeExpiry },
   });
@@ -40,7 +41,7 @@ export const PATCH = async (
     body: emailBody,
   });
 
-  const sendNotification = await db.notifications.create({
+  const sendNotification = await prisma.notifications.create({
     data: {
       userId: user.userId,
       title: "Email Verification code sent",
@@ -51,21 +52,6 @@ export const PATCH = async (
     },
   });
 
-  // if (response?.messageId) {
-  //   await db.notifications.create({
-  //     data: {
-  //       userId,
-  //       title: "Email Verification code sent",
-  //       message: "You have requested a new OTP code. Please check your email.",
-  //       createdBy: "Account",
-  //       isRead: false,
-  //       type: "General",
-  //     },
-  //   });
-  //   return new NextResponse("OTP sent successfully", { status: 200 });
-  // } else {
-  //   return new NextResponse("Failed to send OTP", { status: 500 });
-  // }
   return NextResponse.json({
     message: "OTP sent successfully",
     response,

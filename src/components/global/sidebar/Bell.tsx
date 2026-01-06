@@ -44,7 +44,7 @@ const BellNotification = ({ user, notifications }: BellNotificationProps) => {
 
   const unreadCount =
     notifications?.filter(
-      (n) => !n.isRead && !removedNotifications.includes(n.id) && n.forPMS
+      (n) => !n.isRead && !removedNotifications.includes(n.id)
     ).length || 0;
   const displayList = notifications || [];
 
@@ -113,7 +113,7 @@ const BellNotification = ({ user, notifications }: BellNotificationProps) => {
   const TriggerButton = () => (
     <Button variant='outline' size='icon' className='relative bg-background'>
       <Bell className='w-5 h-5' />
-      {unreadCount > 0 && (
+      {unreadCount >= 1 && (
         <span className='absolute -top-1 -right-1 flex h-2 w-2 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white'></span>
       )}
     </Button>

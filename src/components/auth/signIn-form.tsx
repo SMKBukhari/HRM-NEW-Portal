@@ -50,57 +50,39 @@ const LoginForm = ({ redirectTo }: { redirectTo?: string }) => {
   const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
     try {
       setIsLoading(true);
-      const payload = { ...values, rememberMe };
-      const response = await axios.post("/api/user/signIn", payload);
+      const response = await axios.post("/api/user/signIn", values);
       if (response.data.loginSessionToken) {
-        const expires = rememberMe ? 30 : 1;
+        // Store the session token in localStorage (or you could use cookies)
         Cookies.set("sessionToken", response.data.loginSessionToken, {
-          expires: expires,
+          expires: 1, // Cookie expires in 1 day
         });
         Cookies.set("sessionExpiry", response.data.loginSessionExpiry, {
-          expires: expires,
+          expires: 1, // Cookie expires in 1 day
         });
-        Cookies.set("userId", response.data.userId, { expires: 7 });
+        // Store userId in cookies
+        Cookies.set("userId", response.data.userId, {
+          expires: 7, // Cookie expires in 7 days
+        });
 
         if (response.data.isVerified) {
+          console.log(response.data.role);
+          router.push("/dashboard");
           toast.success("User SignedIn successfully.");
-          // ... rest of the function ...
-          if (redirectTo) {
-            // ... existing redirect logic ...
-            // For brevity, I'll simplify the redirect here to what was there,
-            // but optimized. Copying logic is safer to avoid regression.
-            const projectMatch = redirectTo.match(/^\/projects\/([^\/]+)/);
-            if (projectMatch) {
-              const slug = projectMatch[1];
-              try {
-                const checkSlugResponse = await axios.get(
-                  `/api/projects/checkSlug?slug=${slug}`
-                );
-                if (!checkSlugResponse.data.isAvailable) {
-                  router.push(redirectTo);
-                } else {
-                  router.push("/dashboard");
-                }
-              } catch (e) {
-                router.push("/dashboard");
-              }
-            } else {
-              router.push(redirectTo);
-            }
-          } else {
-            router.push("/dashboard");
-          }
         } else {
-          toast.error(
-            "Your email is not verified. Please verify your email to continue."
+          router.push(`/verify/${response.data.userId}`);
+          toast.success(
+            "User SignedIn successfully, Please Verify Your Email."
           );
         }
       }
     } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data);
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data) {
+          console.error(error.response.data);
+          toast.error("An unexpected error occurred. Please try again.");
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
     } finally {
       setIsLoading(false);

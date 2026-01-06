@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export const POST = async (req: Request) => {
   try {
@@ -9,7 +10,7 @@ export const POST = async (req: Request) => {
       return new NextResponse("User ID is required", { status: 400 });
     }
 
-    const userProfile = await db.userProfile.findFirst({
+    const userProfile = await prisma.userProfile.findFirst({
       where: { userId },
       include: { role: true },
     });

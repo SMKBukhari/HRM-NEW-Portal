@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { compileResetLinkMail, sendMail } from "@/lib/emails/mail";
@@ -11,7 +12,7 @@ export const POST = async (req: Request) => {
       return new NextResponse("Email is required", { status: 400 });
     }
 
-    const user = await db.userProfile.findFirst({
+    const user = await prisma.userProfile.findFirst({
       where: { email },
     });
 
@@ -22,7 +23,7 @@ export const POST = async (req: Request) => {
     const resetToken = crypto.randomBytes(32).toString("hex");
     const resetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // Token valid for 10 minutes
 
-    await db.userProfile.update({
+    await prisma.userProfile.update({
       where: { email },
       data: { resetToken, resetTokenExpiry },
     });
@@ -40,7 +41,7 @@ export const POST = async (req: Request) => {
         body: emailBody,
       });
 
-      const sendNotification = await db.notifications.create({
+      const sendNotification = await prisma.notifications.create({
         data: {
           userId: user.userId,
           title: "Password Reset Link Sent",
@@ -58,11 +59,12 @@ export const POST = async (req: Request) => {
       });
     } catch (emailError) {
       console.error(`EMAIL_SEND_ERROR: ${emailError}`);
-      return new NextResponse("Failed to send email. Please try again later.", { status: 500 });
+      return new NextResponse("Failed to send email. Please try again later.", {
+        status: 500,
+      });
     }
   } catch (error) {
     console.error(`FORGOT_PASSWORD_ERROR: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };
-

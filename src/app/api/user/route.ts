@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -7,27 +8,13 @@ import Cookies from "js-cookie";
 
 export const POST = async (req: Request) => {
   try {
-    const {
-      fullName,
-      email,
-      password,
-      ConfirmPassword,
-      gender,
-      DOB,
-      country,
-      city,
-      contactNumber,
-    } = await req.json();
+    const { fullName, email, password } = await req.json();
 
-    if (!fullName || !email || !password || !gender || !contactNumber) {
+    if (!fullName || !email || !password) {
       return new NextResponse("All fields are required", { status: 400 });
     }
 
-    if (password !== ConfirmPassword) {
-      return new NextResponse("Passwords do not match", { status: 400 });
-    }
-
-    const userExist = await db.userProfile.findFirst({
+    const userExist = await prisma.userProfile.findFirst({
       where: {
         email,
       },
@@ -45,7 +32,7 @@ export const POST = async (req: Request) => {
     const otpCode = crypto.randomInt(100000, 999999).toString();
     const otpCodeExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-    const userRole = await db.role.findFirst({
+    const userRole = await prisma.role.findFirst({
       where: {
         name: "User",
       },
@@ -55,19 +42,13 @@ export const POST = async (req: Request) => {
       return new NextResponse("User Role not found", { status: 500 });
     }
 
-    const company = await db.company.findFirst({});
+    const company = await prisma.company.findFirst({});
 
-    const user = await db.userProfile.create({
+    const user = await prisma.userProfile.create({
       data: {
         fullName,
         email,
         password: hashedPassword,
-        ConfirmPassword: hashedPassword,
-        gender,
-        DOB,
-        country,
-        city,
-        contactNumber,
         otpCode,
         otpCodeExpiry,
         isVerified: false,
@@ -92,7 +73,7 @@ export const POST = async (req: Request) => {
       body: emailBody,
     });
 
-    await db.notifications.create({
+    await prisma.notifications.create({
       data: {
         userId: user.userId,
         title: "Account Created",
@@ -106,24 +87,6 @@ export const POST = async (req: Request) => {
     Cookies.set("userId", user.userId, {
       expires: 1,
     });
-
-    // if (response?.messageId) {
-    //   return NextResponse.json(user, { status: 201 });
-    // } else {
-    //   await db.notifications.create({
-    //     data: {
-    //       userId: user.userId,
-    //       title: "Account Created Failed",
-    //       message: "Your account has been successfully created, but failed to send Mail.",
-    //       createdBy: "Account",
-    //       isRead: false,
-    //       type: "UserCreation",
-    //     },
-    //   });
-    //   return new NextResponse("User created but failed to send Mail", {
-    //     status: 500,
-    //   });
-    // }
 
     return NextResponse.json({ user, response }, { status: 201 });
   } catch (error) {

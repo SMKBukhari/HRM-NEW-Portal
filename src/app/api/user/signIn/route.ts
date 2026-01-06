@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { addDays } from "date-fns";
 
@@ -12,7 +13,7 @@ export const POST = async (req: Request) => {
       return new NextResponse("All fields are required", { status: 400 });
     }
 
-    const user = await db.userProfile.findFirst({
+    const user = await prisma.userProfile.findFirst({
       where: {
         email,
       },
@@ -37,7 +38,7 @@ export const POST = async (req: Request) => {
     const sessionToken = uuidv4();
     const sessionExpiry = addDays(new Date(), rememberMe ? 30 : 1); // Expires in 30 days if rememberMe is true, else 1 day
 
-    await db.userProfile.update({
+    await prisma.userProfile.update({
       where: { email },
       data: {
         loginSessionToken: sessionToken,
@@ -45,7 +46,7 @@ export const POST = async (req: Request) => {
       },
     });
 
-    await db.notifications.create({
+    await prisma.notifications.create({
       data: {
         userId: user.userId,
         title: "SinedIn",

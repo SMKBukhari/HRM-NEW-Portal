@@ -1,10 +1,11 @@
 import { AppSidebar } from "@/components/global/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/global/sidebar/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "HRMS | The Truth International",
@@ -15,7 +16,7 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
-  const user = await db.userProfile.findUnique({
+  const user = await prisma.userProfile.findUnique({
     where: {
       userId: userId,
     },
@@ -29,7 +30,7 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
     redirect("/signIn");
   }
 
-  const notifications = await db.notifications.findMany({
+  const notifications = await prisma.notifications.findMany({
     where: {
       userId: userId,
       forPMS: false,

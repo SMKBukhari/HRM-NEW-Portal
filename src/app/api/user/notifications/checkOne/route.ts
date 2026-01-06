@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (req: Request) => {
@@ -9,7 +10,7 @@ export const PATCH = async (req: Request) => {
       return new NextResponse("Notification ID is required", { status: 400 });
     }
 
-    const notification = await db.notifications.update({
+    const notification = await prisma.notifications.update({
       where: { id: notificationId },
       data: { isRead: true },
     });

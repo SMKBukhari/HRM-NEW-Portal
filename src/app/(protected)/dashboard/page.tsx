@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -12,7 +13,7 @@ const page = async () => {
     redirect("/signIn");
   }
 
-  const user = await db.userProfile.findUnique({
+  const user = await prisma.userProfile.findUnique({
     where: {
       userId: userId,
     },
@@ -27,18 +28,18 @@ const page = async () => {
     },
   });
 
-  const jobApplications = await db.jobApplications.findMany({
+  const jobApplications = await prisma.jobApplications.findMany({
     where: {
       id: user?.currentJobApplicationId || "",
     },
   });
 
-  const jobs = await db.job.findMany({
+  const jobs = await prisma.job.findMany({
     where: {
       isPusblished: true,
     },
   });
-  const departments = await db.department.findMany();
+  const departments = await prisma.department.findMany();
 
   if (user?.isVerified === false) {
     redirect(`/verify/${userId}`);

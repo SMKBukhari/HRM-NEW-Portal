@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const cookieStore = cookies();
@@ -10,7 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await db.userProfile.findUnique({
+  const user = await prisma.userProfile.findUnique({
     where: { userId },
     include: { role: true },
   });

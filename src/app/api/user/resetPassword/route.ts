@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
@@ -10,7 +11,7 @@ export const POST = async (req: Request) => {
       return new NextResponse("All fields are required!", { status: 400 });
     }
 
-    const user = await db.userProfile.findFirst({
+    const user = await prisma.userProfile.findFirst({
       where: { resetToken: token },
     });
 
@@ -24,7 +25,7 @@ export const POST = async (req: Request) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.userProfile.update({
+    await prisma.userProfile.update({
       where: { userId: user.userId },
       data: {
         password: hashedPassword,
@@ -34,7 +35,7 @@ export const POST = async (req: Request) => {
       },
     });
 
-    await db.notifications.create({
+    await prisma.notifications.create({
       data: {
         userId: user.userId,
         title: "Password Reset Successful",

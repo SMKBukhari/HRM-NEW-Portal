@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (req: Request) => {
@@ -9,7 +10,7 @@ export const PATCH = async (req: Request) => {
       return new NextResponse("User ID is required", { status: 400 });
     }
 
-    const userProfile = await db.userProfile.findFirst({
+    const userProfile = await prisma.userProfile.findFirst({
       where: { userId },
     });
 
@@ -17,7 +18,7 @@ export const PATCH = async (req: Request) => {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    const checkAllNotifications = await db.notifications.updateMany({
+    const checkAllNotifications = await prisma.notifications.updateMany({
       where: {
         userId,
         isRead: false,

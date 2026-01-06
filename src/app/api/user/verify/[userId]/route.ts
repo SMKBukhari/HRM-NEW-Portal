@@ -6,7 +6,7 @@ export const PATCH = async (
   { params }: { params: { userId: string } }
 ) => {
   try {
-    const { userId } = params;
+    const { userId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 400 });
@@ -56,7 +56,7 @@ export const PATCH = async (
       },
     });
 
-    return NextResponse.json({updatedUser, sendNotification});
+    return NextResponse.json({ updatedUser, sendNotification });
   } catch (error) {
     console.log(`[OTP_PATCH]: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });

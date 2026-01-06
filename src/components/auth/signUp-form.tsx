@@ -57,19 +57,19 @@ const SignUpForm = ({ redirectTo }: { redirectTo?: string }) => {
   const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
     try {
       setIsLoading(true);
-      const payload = { ...values, rememberMe: false };
-      const response = await axios.post("/api/user/signIn", payload);
-
-      if (response.data.loginSessionToken) {
-        Cookies.set("sessionToken", response.data.loginSessionToken, {
-          expires: 1,
-        });
-        Cookies.set("userId", response.data.userId, { expires: 7 });
-        toast.success("Account created successfully!");
-        router.push(redirectTo || "/dashboard");
+      const response = await axios.post("/api/user", values);
+      router.push(`/verify/${response.data.user.userId}`);
+      toast.success(
+        "Account created successfully, Please First Verify Your Email."
+      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
-    } catch (error: any) {
-      toast.error(error.response?.data || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -179,7 +179,12 @@ const SignUpForm = ({ redirectTo }: { redirectTo?: string }) => {
             </div>
           </div>
 
-          <Button disabled={isLoading} type='submit' className='w-full'>
+          <Button
+            disabled={isLoading}
+            type='submit'
+            className='w-full'
+            onClick={() => onSubmit(form.getValues())}
+          >
             {isLoading ? (
               <Loader2 className='w-4 h-4 animate-spin' />
             ) : (

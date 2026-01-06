@@ -1,7 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     const { token } = req.body;
 
@@ -10,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Check token in the database
-    const user = await db.userProfile.findFirst({
+    const user = await prisma.userProfile.findFirst({
       where: {
         loginSessionToken: token,
         loginSessionExpiry: {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { SignUpSchema } from "@/schemas"; // Base schema import if possible, or re-define validation
 import { NotificationCreator } from "@prisma/client";
@@ -26,7 +27,7 @@ export const POST = async (req: Request) => {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const existingUser = await db.userProfile.findFirst({
+    const existingUser = await prisma.userProfile.findFirst({
       where: {
         email,
       },
@@ -40,7 +41,7 @@ export const POST = async (req: Request) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await db.userProfile.create({
+    const newUser = await prisma.userProfile.create({
       data: {
         userId: uuidv4(),
         email,
@@ -57,7 +58,7 @@ export const POST = async (req: Request) => {
     });
 
     // Optionally create a notification
-    await db.notifications.create({
+    await prisma.notifications.create({
       data: {
         userId: newUser.userId,
         title: "Account Created",

@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { db } from "@/lib/db";
+// import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI("AIzaSyACThcmJesW8hVaVQ0TQBD7w7T_e70QJZg");
@@ -159,7 +160,7 @@ export class GeminiAIService {
       const message = userMessage.toLowerCase();
 
       // Fetch basic user profile
-      data.userProfile = await db.userProfile.findUnique({
+      data.userProfile = await prisma.userProfile.findUnique({
         where: { userId },
         select: {
           fullName: true,
@@ -188,7 +189,7 @@ export class GeminiAIService {
         const today = new Date();
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        data.attendance = await db.attendence.findMany({
+        data.attendance = await prisma.attendence.findMany({
           where: {
             userId,
             date: {
@@ -204,7 +205,7 @@ export class GeminiAIService {
           take: 10,
         });
 
-        data.todayAttendance = await db.attendence.findFirst({
+        data.todayAttendance = await prisma.attendence.findFirst({
           where: {
             userId,
             date: {
@@ -231,14 +232,14 @@ export class GeminiAIService {
           balance: data.userProfile?.totalLeavesBalance,
         };
 
-        data.recentLeaveRequests = await db.leaveRequest.findMany({
+        data.recentLeaveRequests = await prisma.leaveRequest.findMany({
           where: { userId },
           include: { leaveType: true },
           orderBy: { createdAt: "desc" },
           take: 5,
         });
 
-        data.publicHolidays = await db.publicHoliday.findMany({
+        data.publicHolidays = await prisma.publicHoliday.findMany({
           where: {
             OR: [{ isForAll: true }, { employees: { some: { userId } } }],
             date: { gte: new Date() },
@@ -269,7 +270,7 @@ export class GeminiAIService {
         data.contractInfo = {
           startDate: data.userProfile?.contractStartDate,
           endDate: data.userProfile?.contractEndDate,
-          renewals: await db.contractRenewal.findMany({
+          renewals: await prisma.contractRenewal.findMany({
             where: { userId },
             orderBy: { createdAt: "desc" },
           }),
@@ -282,7 +283,7 @@ export class GeminiAIService {
         message.includes("review") ||
         message.includes("appraisal")
       ) {
-        data.performanceReviews = await db.appraisal.findMany({
+        data.performanceReviews = await prisma.appraisal.findMany({
           where: { userId },
           orderBy: { appraisalDate: "desc" },
           take: 3,
@@ -295,7 +296,7 @@ export class GeminiAIService {
         message.includes("timing") ||
         message.includes("shift")
       ) {
-        data.workSchedule = await db.timeTable.findMany({
+        data.workSchedule = await prisma.timeTable.findMany({
           where: { userId },
           orderBy: { date: "desc" },
           take: 7,
@@ -308,14 +309,14 @@ export class GeminiAIService {
       }
 
       // Recent notifications
-      data.recentNotifications = await db.notifications.findMany({
+      data.recentNotifications = await prisma.notifications.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
         take: 5,
       });
 
       // Pending requests
-      data.pendingRequests = await db.requests.findMany({
+      data.pendingRequests = await prisma.requests.findMany({
         where: {
           userId,
           status: "Pending",
