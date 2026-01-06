@@ -1,0 +1,87 @@
+"use client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import * as z from "zod";
+import { Input } from "@/components/ui/input";
+import { ForgotPasswordSchema } from "@/schemas";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormLabel,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { CardWrapper } from "@/components/auth/card-wrapper";
+import { Button } from "@/components/ui/button";
+import { Loader2, Mail } from "lucide-react";
+import axios from "axios";
+import { useState } from "react";
+import { toast } from "sonner";
+import CustomFormField from "../global/CustomFormField";
+import { FormFieldType } from "@/lib/enums";
+
+const ForgotPasswordForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
+    resolver: zodResolver(ForgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+    mode: "onBlur",
+  });
+
+  const onSubmit = async (values: z.infer<typeof ForgotPasswordSchema>) => {
+    try {
+      setIsLoading(true);
+      await axios.post("/api/user/forgotPassword", values);
+      toast.success(
+        "We have sent you an email with a link to reset your password. Please check your inbox."
+      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error?.response?.data || "An unexpected error occurred.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <CardWrapper
+      headerText='Forgot Password'
+      headerLabel='Enter your email to continue'
+      backButtonLabel='I know my Password?'
+      backButtonHref='/signIn'
+      isbackButton
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <CustomFormField
+            control={form.control}
+            name='email'
+            label='Email address'
+            isRequired
+            placeholder='john.doe@example.com'
+            fieldType={FormFieldType.INPUT}
+            icon={Mail}
+          />
+          <Button disabled={isLoading} type='submit' className='w-full'>
+            {isLoading ? (
+              <Loader2 className='w-3 h-3 animate-spin' />
+            ) : (
+              "Forgot Password"
+            )}
+          </Button>
+        </form>
+      </Form>
+    </CardWrapper>
+  );
+};
+
+export default ForgotPasswordForm;

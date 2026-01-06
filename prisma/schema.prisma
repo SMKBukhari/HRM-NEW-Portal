@@ -1,0 +1,1612 @@
+// =============================================
+// PRISMA SCHEMA CONFIGURATION
+// =============================================
+
+// Generator configuration for Prisma Client
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Database connection configuration
+datasource db {
+  provider = "mysql"
+}
+
+// =============================================
+// ENUM DEFINITIONS
+// =============================================
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum NotificationType {
+  General
+  Task
+  Event
+  Announcement
+  ProfileUpdate
+  UserCreation
+  Verification
+  RoleChange
+  Alert
+  Achievement
+  Reminder
+  Reward
+  Security
+  Contract
+}
+
+enum NotificationCreator {
+  Applicant
+  Admin
+  CEO
+  Manager
+  Employee
+  Account
+}
+
+enum LeaveStatus {
+  Pending
+  Approved
+  Rejected
+  Canceled
+  PendingHigherApproval
+}
+
+enum ResignationStatus {
+  Pending
+  Approved
+  Rejected
+  Canceled
+}
+
+enum RequestStatus {
+  Pending
+  Approved
+  Rejected
+  Completed
+  InProgress
+  Recomended
+}
+
+enum ShiftType {
+  Morning
+  Evening
+  Off
+}
+
+enum ContractRenewalStatus {
+  Pending
+  Accepted
+  Rejected
+  Expired
+  Withdrawn
+}
+
+// =============================================
+// MEETING ENUMS
+// =============================================
+
+enum MeetingType {
+  Virtual
+  Physical
+}
+
+enum MeetingStatus {
+  Scheduled
+  InProgress
+  Completed
+  Cancelled
+}
+
+enum MeetingPriority {
+  Low
+  Medium
+  High
+  Urgent
+}
+
+enum RecurringType {
+  Daily
+  Weekly
+  Monthly
+  Yearly
+}
+
+enum VisibilityType {
+  CC // Participants can see each other
+  BCC // Participants cannot see each other
+}
+
+enum ParticipantRole {
+  Organizer
+  CoOrganizer
+  Attendee
+  Optional
+}
+
+enum ResponseStatus {
+  Pending
+  Accepted
+  Declined
+}
+
+enum NoteType {
+  General
+  ActionItem
+  Decision
+  KeyPoint
+  Question
+}
+
+enum ActivityType {
+  UnexplainedBreak // Default type when a break is detected
+  OfficialWork // Type set by admin during reconciliation
+  PersonalBreak // Type set after confirmation
+  ShortBreak
+}
+
+// =============================================
+// PROJECT MANAGEMENT SYSTEM EXTENSION
+// =============================================
+
+enum ProjectStatus {
+  InProgress
+  InReview
+  Completed
+  Cancelled
+}
+
+enum TaskStatus {
+  InProgress
+  InReview
+  Completed
+  Cancelled
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+  Urgent
+}
+
+enum TaskType {
+  ProjectTask
+  DailyTask
+  SubTask
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
+  Expired
+}
+
+enum ActivityAction {
+  Create
+  Update
+  Delete
+  StatusChange
+  Assign
+  Comment
+  Attachment
+  Favorite
+  InProgress
+  InReview
+  Complete
+  Cancelled
+}
+
+enum CommentType {
+  Project
+  Task
+  SubTask
+}
+
+// =============================================
+// USER MANAGEMENT MODELS
+// =============================================
+
+// Main user profile model containing all employee information
+model UserProfile {
+  // Identification and authentication fields
+  userId              String   @id @unique @default(cuid())
+  email               String   @unique
+  password            String
+  ConfirmPassword     String?
+  isVerified          Boolean? @default(false)
+  includeInAttendance Boolean? @default(true)
+
+  // Personal information
+  fullName               String
+  gender                 Gender    @default(Male)
+  DOB                    DateTime?
+  contactNumber          String?
+  emergencyContactNumber String?
+  bloodGroup             String?
+  userImage              String?
+  cnic                   String?
+
+  // Address information
+  address String?
+  city    String?
+  country String?
+
+  // Professional information
+  departmentId       String?
+  department         Department? @relation(fields: [departmentId], references: [id])
+  departmentOffered  String?
+  designation        String?
+  designationOffered String?
+  roleId             String?
+  role               Role?       @relation(fields: [roleId], references: [id])
+  roleOffered        String?
+  isHired            Boolean?    @default(false)
+  salary             String?
+  salaryOffered      String?
+  DOJ                DateTime?
+
+  // Contract information
+  contractStartDate    DateTime?
+  contractEndDate      DateTime?
+  contractDuration     String? // e.g., "1 year", "6 months"
+  contractRenewalCount Int?      @default(0)
+  hasActiveRenewal     Boolean?  @default(false)
+
+  // Documents and attachments
+  resumeUrl           String?
+  resumeName          String?
+  resumePublicId      String?
+  offerLetterUrl      String?
+  offerLetterName     String?
+  offerLetterPublicId String?
+
+  // Work schedule
+  officeTimingIn  String?
+  OfficeTimingOut String?
+
+  // Social media and communication
+  skype        String?
+  linkedIn     String?
+  github       String?
+  twitter      String?
+  facebook     String?
+  instagram    String?
+  behance      String?
+  zoomId       String?
+  googleMeetId String?
+
+  // Authentication tokens
+  otpCode            String?
+  otpCodeExpiry      DateTime?
+  resetToken         String?
+  resetTokenExpiry   DateTime?
+  loginSessionToken  String?
+  loginSessionExpiry DateTime?
+
+  // Status and relations
+  workstatusId            String?
+  workstatus              WorkStatus?        @relation(fields: [workstatusId], references: [id])
+  statusId                String?
+  status                  Status?            @relation(fields: [statusId], references: [id])
+  applicationStatusId     String?
+  applicationStatus       ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  currentJobApplicationId String?
+  companyId               String?
+  company                 company?           @relation(fields: [companyId], references: [id])
+
+  // Leave management
+  totalYearlyLeaves  String  @default("36")
+  totalMonthlyLeaves String  @default("3")
+  totalLeavesTaken   String  @default("0")
+  totalLeavesBalance String?
+
+  // Relations to other models
+  jobExperience          JobExperience[]
+  education              Education[]
+  skills                 Skills[]
+  notifications          Notifications[]
+  JobApplications        JobApplications[]
+  leaveRequests          LeaveRequest[]
+  TimeTable              TimeTable[]
+  Attendence             Attendence[]
+  ResignationRequests    ResignationRequests[]
+  Warnings               Warnings[]
+  Requests               Requests[]
+  ProfieUpdateRequests   ProfieUpdateRequests[]
+  Complaints             Complaints[]
+  publicHolidays         PublicHoliday[]                @relation("HolidayEmployees")
+  WorkFromHome           WorkFromHome[]
+  leaveBalanceAdjustment LeaveBalanceAdjustment[]
+  Appraisal              Appraisal[]
+  ContractRenewals       ContractRenewal[]
+  calculationHistory     AttendanceCalculationHistory[] @relation("CalculationHistory")
+  activityLogs           ActivityLog[]
+
+  // Meeting relations
+  organizedMeetings   Meeting[]            @relation("MeetingOrganizer")
+  meetingParticipants MeetingParticipant[] @relation("MeetingParticipants")
+  meetingNotes        MeetingNote[]        @relation("MeetingNotes")
+  meetingApprovals    MeetingApproval[]    @relation("MeetingApprovals")
+
+  // Project Management Relations
+  createdProjects     Project[]           @relation("ProjectCreatedBy")
+  createdTasks        Task[]              @relation("TaskCreatedBy")
+  assignedByTasks     Task[]              @relation("TaskAssignedBy")
+  taskMembers         TaskMember[]
+  approvedTasks       Task[]              @relation("TaskApprovedBy")
+  completedTasks      Task[]              @relation("TaskCompletedBy")
+  projectMembers      ProjectMember[]
+  projectComments     ProjectComment[]
+  taskComments        TaskComment[]
+  projectAttachments  ProjectAttachment[]
+  taskAttachments     TaskAttachment[]
+  projectFavorites    ProjectFavorite[]
+  taskFavorites       TaskFavorite[]
+  projectActivities   ProjectActivity[]
+  taskActivities      TaskActivity[]
+  timeLogs            TimeLog[]
+  sentInvitations     ProjectInvitation[] @relation("InvitationSentBy")
+  acceptedInvitations ProjectInvitation[] @relation("InvitationAcceptedBy")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// COMPANY STRUCTURE MODELS
+// =============================================
+
+model company {
+  id                    String  @id @unique @default(cuid())
+  name                  String  @unique
+  logo                  String?
+  email                 String?
+  contact               String?
+  address               String?
+  companyPolicyUrl      String?
+  companyPolicyName     String?
+  companyPolicyPublicId String?
+
+  // Relations
+  UserProfile   UserProfile[]
+  publicHoliday PublicHoliday[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Department {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  // Project Management Relations
+  projects  Project[]
+  tasks     Task[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model Role {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model WorkStatus {
+  id         String        @id @unique @default(cuid())
+  name       String        @unique
+  users      UserProfile[]
+  Attendence Attendence[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @default(now())
+}
+
+model Status {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model ApplicationStatus {
+  id              String            @id @unique @default(cuid())
+  name            String            @unique
+  users           UserProfile[]
+  JobApplications JobApplications[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+}
+
+// =============================================
+// ATTENDANCE AND TIME MANAGEMENT MODELS
+// =============================================
+
+model TimeTable {
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  employeeName String
+  date         DateTime
+  shiftStart   DateTime?
+  shiftEnd     DateTime?
+  shiftType    ShiftType
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+}
+
+model Attendence {
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  date         DateTime
+  workingHours String?
+  workStatusId String?
+  workStatus   WorkStatus? @relation(fields: [workStatusId], references: [id])
+  checkLodId   String?
+  checkLog     CheckLog?   @relation(fields: [checkLodId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+}
+
+model CheckLog {
+  id                 String       @id @unique @default(cuid())
+  checkInTime        DateTime
+  checkInTimeString  String?
+  checkOutTime       DateTime?
+  checkOutTimeString String?
+  workingHours       String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now())
+  Attendence         Attendence[]
+}
+
+model LeaveBalanceAdjustment {
+  id             String      @id @unique @default(cuid())
+  userId         String
+  user           UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  entitledLeaves String
+  reason         String
+  date           DateTime
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now())
+}
+
+model PublicHoliday {
+  id        String        @id @unique @default(cuid())
+  date      DateTime
+  name      String
+  companyId String
+  company   company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  isForAll  Boolean       @default(true)
+  employees UserProfile[] @relation("HolidayEmployees")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+// =============================================
+// LEAVE AND REQUEST MANAGEMENT MODELS
+// =============================================
+
+model LeaveRequest {
+  id                    String       @id @unique @default(cuid())
+  userId                String?
+  user                  UserProfile? @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  leaveTypeId           String
+  leaveType             LeaveType    @relation(fields: [leaveTypeId], references: [id])
+  isHalfLeave           Boolean?     @default(false)
+  leaveCreditDeducted   Float?
+  startDate             DateTime
+  endDate               DateTime
+  reason                String       @db.LongText
+  status                LeaveStatus  @default(Pending)
+  managerApproval       Boolean?     @default(false)
+  adminApproval         Boolean?     @default(false)
+  ceoApproval           Boolean?     @default(false)
+  requireHigherApproval Boolean?     @default(false)
+  approvedBy            String?
+  rejectedBy            String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @default(now())
+}
+
+model LeaveType {
+  id            String         @id @unique @default(cuid())
+  name          String         @unique
+  leaveRequests LeaveRequest[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
+}
+
+model WorkFromHome {
+  id         String      @id @unique @default(cuid())
+  userId     String
+  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String      @db.LongText
+  status     String      @default("Pending")
+  aprrovedBy String?
+  rejectedBy String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
+}
+
+model ResignationRequests {
+  id            String            @id @unique @default(cuid())
+  userId        String
+  user          UserProfile       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  reason        String            @db.LongText
+  status        ResignationStatus @default(Pending)
+  adminApproval Boolean?          @default(false)
+  ceoApproval   Boolean?          @default(false)
+  approvedBy    String?
+  rejectedBy    String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @default(now())
+}
+
+// =============================================
+// JOB AND RECRUITMENT MODELS
+// =============================================
+
+model Job {
+  id                String  @id @unique @default(cuid())
+  userId            String
+  title             String
+  description       String? @db.LongText
+  shortDescription  String? @db.Text
+  imageName         String?
+  imageUrl          String?
+  imagePublicId     String?
+  isPusblished      Boolean @default(false)
+  shiftTiming       String?
+  salary            String?
+  yearsOfExperience String?
+  workMode          String?
+  department        String?
+
+  // Relations
+  attachments  Attachments[]
+  applications JobApplications[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model JobApplications {
+  id                  String             @id @unique @default(cuid())
+  jobId               String
+  job                 Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId              String
+  user                UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  applicationStatusId String?
+  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  rejectedReason      String?            @db.LongText
+
+  // Application details
+  coverLetter      String? @db.LongText
+  department       String?
+  resumeUrl        String?
+  resumeName       String?
+  resumePublicId   String?
+  reference        String?
+  referenceContact String?
+
+  // Interview details
+  appliedDate   DateTime? @default(now())
+  interviewDate DateTime?
+  isInterviewed Boolean?  @default(false)
+
+  // Evaluation fields
+  experience             String?
+  skills                 String?
+  education              String?
+  jobKnowledge           String?
+  generalKnowledge       String?
+  culturalFit            String?
+  adaptability           String?
+  motivation             String?
+  problemSolving         String?
+  communication          String?
+  teamWork               String?
+  leaderShipPotential    String?
+  professionalism        String?
+  criticalThinking       String?
+  appearance             String?
+  maturity               String?
+  strengths              String?
+  weaknesses             String?
+  remarks                String?
+  salaryExpectation      String?
+  interviewerName        String?
+  interviewerDesignation String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Attachments {
+  id        String   @id @unique @default(cuid())
+  name      String
+  url       String
+  publicId  String
+  jobId     String
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// EMPLOYEE PROFILE MODELS
+// =============================================
+
+model JobExperience {
+  id               String      @id @unique @default(cuid())
+  userProfileId    String
+  userProfile      UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  jobTitle         String
+  employmentType   String
+  companyName      String
+  location         String
+  startDate        DateTime?
+  currentlyWorking Boolean?
+  endDate          DateTime?
+  description      String?
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userProfileId], name: "idj_userProfileId")
+}
+
+model Education {
+  id                String      @id @unique @default(cuid())
+  userProfileId     String
+  userProfile       UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  university        String
+  degree            String
+  fieldOfStudy      String
+  grade             String?
+  startDate         DateTime?
+  currentlyStudying Boolean?    @default(false)
+  endDate           DateTime?
+  description       String?
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userProfileId], name: "ide_userProfileId")
+}
+
+model Skills {
+  id              String      @id @unique @default(cuid())
+  userProfileId   String
+  userProfile     UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  name            String
+  experienceLevel String
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+}
+
+model ProfieUpdateRequests {
+  id     String      @id @unique @default(cuid())
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Approval status
+  aprroved Boolean? @default(false)
+  rejected Boolean? @default(false)
+
+  // Personal information updates
+  fullName               String?
+  email                  String?
+  password               String?
+  ConfirmPassword        String?
+  gender                 String?
+  contactNumber          String?
+  emergencyContactNumber String?
+  DOB                    DateTime?
+  bloodGroup             String?
+  city                   String?
+  country                String?
+  address                String?
+  userImage              String?
+  cnic                   String?
+
+  // Professional information updates
+  skype        String?
+  linkedIn     String?
+  github       String?
+  twitter      String?
+  facebook     String?
+  instagram    String?
+  behance      String?
+  zoomId       String?
+  googleMeetId String?
+
+  // Document updates
+  resumeUrl      String?
+  resumeName     String?
+  resumePublicId String?
+
+  // Relations
+  jobExperience JobExperience[]
+  education     Education[]
+  skills        Skills[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// NOTIFICATION AND COMMUNICATION MODELS
+// =============================================
+
+model Notifications {
+  id          String              @id @unique @default(cuid())
+  userId      String
+  user        UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String
+  createdBy   NotificationCreator
+  senderImage String?
+  link        String?
+  type        NotificationType
+  forPMS      Boolean             @default(false)
+  isRead      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+}
+
+model Warnings {
+  id                String              @id @unique @default(cuid())
+  userId            String
+  user              UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title             String
+  message           String              @db.LongText
+  senderName        String
+  senderDesignation String
+  createdBy         NotificationCreator
+  senderImage       String?
+  link              String?
+  isRead            Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+}
+
+model Requests {
+  id                String           @id @unique @default(cuid())
+  userId            String
+  user              UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  requestTo         String?
+  requestMessage    String           @db.LongText
+  status            RequestStatus    @default(Pending)
+  requestCategoryId String?
+  RequestCategory   RequestCategory? @relation(fields: [requestCategoryId], references: [id])
+  exemptionDate     DateTime?
+  fromDate          DateTime?
+  toDate            DateTime?
+  fromTime          String? // e.g. "09:30"
+  toTime            String? // e.g. "18:00"
+  // (full datetime in UTC)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+}
+
+model RequestCategory {
+  id        String     @id @unique @default(cuid())
+  name      String     @unique
+  requests  Requests[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
+
+model Complaints {
+  id          String      @id @unique @default(cuid())
+  userId      String
+  user        UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String      @db.LongText
+  isAnonymous Boolean?    @default(false)
+  complaintTo String?
+  status      String      @default("Pending")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+}
+
+// =============================================
+// APPRAISAL AND FEEDBACK MODELS
+// =============================================
+
+model Appraisal {
+  id            String      @id @unique @default(cuid())
+  userId        String
+  user          UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  appraisalDate DateTime
+  isAppraised   Boolean?    @default(false)
+
+  // =============================================
+  // APPRAISAL FIELDS
+  // =============================================
+  // Personality
+  appearance                             String?
+  intelligence                           String?
+  relWithSupervisor                      String?
+  relWithColleagues                      String?
+  teamWork                               String?
+  abilityToCommunicateWrittenly          String?
+  abilityToCommunicateSpokenly           String?
+  // Attitude
+  integrityGeneral                       String?
+  integrityIntellectual                  String?
+  dedicationToWork                       String?
+  reliability                            String?
+  responseUnderStressMentalPhysical      String?
+  willingnessToAcceptAddedResponsibility String?
+  initiative                             String?
+  financialAbility                       String?
+  // Professional Abilities
+  professionalKnowledge                  String?
+  creativeness                           String?
+  abilityToTakeDecisions                 String?
+  tendencyToLearn                        String?
+  abilityToPlanAndOrganizeWork           String?
+  optimalUseOfResources                  String?
+  outputRelativeToGoalsQuantity          String?
+  outputRelativeToGoalsQuality           String?
+  analyticalAbility                      String?
+  // Remarks and Overall Evaluation
+  commentsOnJobDescription               String?  @db.LongText
+  commentsOnOverallPerformance           String?  @db.LongText
+  specificAdviceToTheEmployee            String?  @db.LongText
+  // Number of Warning Letters
+  numberOfWarningLettersInThisContract   String?
+  remarksByHR                            String?  @db.LongText
+  remarksByCEO                           String?  @db.LongText
+  approved                               Boolean?
+
+  // =============================================
+  // =============================================
+
+  appraisaledBy            String?
+  appraisaledByDesignation String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now())
+}
+
+// =============================================
+// CONTRACT MANAGEMENT MODELS
+// =============================================
+
+model ContractRenewal {
+  id     String                @id @unique @default(cuid())
+  userId String
+  user   UserProfile           @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  status ContractRenewalStatus @default(Pending)
+
+  // Current contract details
+  currentDesignation String?
+  currentDepartment  String?
+  currentRole        String?
+  currentSalary      String?
+  currentStartDate   DateTime?
+  currentEndDate     DateTime?
+  currentLeaves      String?
+
+  // Proposed contract details
+  proposedDesignation String?
+  proposedDepartment  String?
+  proposedRole        String?
+  proposedSalary      String?
+  proposedStartDate   DateTime?
+  proposedEndDate     DateTime?
+  proposedDuration    String?
+  proposedLeaves      String?
+
+  // Contract documents
+  contractOfferUrl      String?
+  contractOfferName     String?
+  contractOfferPublicId String?
+
+  // Workflow tracking
+  initiatedBy     String? // Admin/CEO who initiated
+  initiatedByName String?
+  responseDate    DateTime?
+  rejectionReason String?   @db.LongText
+  expiryDate      DateTime? // When the renewal offer expires
+  remindersSent   Int?      @default(0)
+  isPortalBlocked Boolean?  @default(true) // Block employee portal actions
+
+  // History and notes
+  renewalNumber Int? // 1st renewal, 2nd renewal, etc.
+  notes         String? @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// MEETING MANAGEMENT MODELS
+// =============================================
+
+model Meeting {
+  id          String  @id @unique @default(cuid())
+  title       String
+  description String? @db.LongText
+
+  // Meeting scheduling
+  startDateTime   DateTime
+  endDateTime     DateTime
+  timezone        String      @default("UTC")
+  venue           String? // Physical location or meeting link
+  meetingType     MeetingType @default(Physical)
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+
+  // Meeting status
+  status   MeetingStatus   @default(Scheduled)
+  priority MeetingPriority @default(Medium)
+
+  // Organizer information
+  organizerId String
+  organizer   UserProfile @relation("MeetingOrganizer", fields: [organizerId], references: [userId], onDelete: Cascade)
+
+  // Privacy settings
+  visibilityType VisibilityType @default(CC) // CC or BCC
+
+  // Meeting Minutes (MoM)
+  meetingMinutes          Boolean @default(false)
+  businessFromLastMeeting String? @db.LongText
+  openIssues              String? @db.LongText
+  newBusiness             String? @db.LongText
+  updatesAndAnnouncements String? @db.LongText
+  adjourment              String? @db.LongText
+
+  // Meeting completion
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+
+  // MoM edit tracking
+  momEditCount             Int     @default(0)
+  momEditPermissionGranted Boolean @default(false)
+
+  // Relations
+  participants MeetingParticipant[]
+  notes        MeetingNote[]
+  approvals    MeetingApproval[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MeetingParticipant {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation("MeetingParticipants", fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Participant role in meeting
+  role ParticipantRole @default(Attendee)
+
+  // Response status
+  responseStatus ResponseStatus @default(Pending)
+  responseAt     DateTime?
+
+  // Permissions
+  canEditNotes Boolean @default(false)
+  canSeeOthers Boolean @default(true) // For BCC functionality
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([meetingId, userId])
+}
+
+model MeetingNote {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    UserProfile @relation("MeetingNotes", fields: [authorId], references: [userId], onDelete: Cascade)
+
+  // Note content
+  title    String?
+  content  String   @db.LongText // Rich text content from TipTap
+  noteType NoteType @default(General)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MeetingApproval {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation("MeetingApprovals", fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Approval status
+  isApproved Boolean   @default(false)
+  approvedAt DateTime?
+  comments   String?   @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([meetingId, userId])
+}
+
+// =============================================
+// ATTENDANCE CALCULATION HISTORY MODELS
+// =============================================
+
+enum CalculationStatus {
+  Pending
+  Approved
+  Rejected
+  Restored
+  PartiallyRestored
+}
+
+enum CalculationActionType {
+  UnauthorizedAbsence
+  LateArrival
+  EarlyExit
+  SandwichDay
+  HalfLeaveDeduction
+  LeaveCredit
+  LateCountUpdate
+  LeaveBalanceDeduction
+  BreakDeduction
+}
+
+model AttendanceCalculationHistory {
+  id           String      @id @unique @default(cuid())
+  calculatedBy String
+  calculator   UserProfile @relation("CalculationHistory", fields: [calculatedBy], references: [userId], onDelete: Cascade)
+
+  // Calculation parameters
+  dateFrom    DateTime
+  dateTo      DateTime
+  employeeIds String   @db.LongText // JSON array of employee IDs
+
+  // Calculation results summary
+  totalEmployees                Float
+  totalDaysChecked              Float
+  totalUnauthorizedAbsences     Float
+  totalLateArrivals             Float
+  totalEarlyExits               Float
+  totalLeavesDeducted           Float
+  totalSandwichDays             Float
+  totalSandwichDeductions       Float
+  totalHalfLeaveDeductionsLate  Float
+  totalHalfLeaveDeductionsEarly Float
+  totalHalfLeaveDeductions      Float
+  totalCreditedLeaves           Float
+  totalCreditedLeaveCount       Float
+
+  // Status and approval
+  status     CalculationStatus @default(Pending)
+  approvedBy String?
+  approvedAt DateTime?
+  rejectedBy String?
+  rejectedAt DateTime?
+  restoredBy String?
+  restoredAt DateTime?
+
+  // Relations
+  employeeResults AttendanceCalculationEmployeeResult[]
+  actions         AttendanceCalculationAction[]
+  activities      ActivityLog[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AttendanceCalculationEmployeeResult {
+  id            String                       @id @unique @default(cuid())
+  calculationId String
+  calculation   AttendanceCalculationHistory @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+
+  // Employee details
+  userId   String
+  fullName String
+
+  // Calculation results
+  totalDaysChecked                Int
+  unauthorizedAbsences            String @db.LongText // JSON array of dates
+  lateArrivals                    String @db.LongText // JSON array of dates
+  earlyExits                      String @db.LongText // JSON array of dates
+  leavesDeducted                  Float
+  sandwichDays                    String @db.LongText // JSON array of dates
+  sandwichDeductions              Float
+  halfLeaveDeductionsLate         Float
+  halfLeaveDeductionsEarly        Float
+  totalHalfLeaveDeductions        Float
+  unauthorizedHalfLeaveDatesLate  String @db.LongText // JSON array of dates
+  unauthorizedHalfLeaveDatesEarly String @db.LongText // JSON array of dates
+  creditedLeaves                  String @db.LongText // JSON array of dates
+  creditedLeaveCount              Float
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AttendanceCalculationAction {
+  id            String                       @id @unique @default(cuid())
+  calculationId String
+  calculation   AttendanceCalculationHistory @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+
+  // Action details
+  actionType   CalculationActionType
+  userId       String // Employee affected
+  fullName     String
+  date         DateTime
+  description  String                @db.LongText
+  leaveAmount  Float? // Amount of leaves to deduct/credit (0.5 for half, 1.0 for full)
+  breakDetails Json?
+
+  // Reconciliation fields
+  reconciledType String? // "OfficialWork" | "PersonalBreak" | "UnexplainedBreak"
+  reconciledBy   String?
+  reconciledAt   DateTime?
+
+  // Status tracking
+  isApplied  Boolean   @default(false)
+  appliedAt  DateTime?
+  isRestored Boolean   @default(false)
+  restoredAt DateTime?
+  restoredBy String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id     String      @id @unique @default(cuid())
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // This is where the admin's decision is stored
+  type ActivityType @default(UnexplainedBreak)
+
+  // The actual times of the break
+  startTime       DateTime
+  endTime         DateTime
+  durationMinutes Int // Store the calculated duration
+
+  // Link to the calculation it belongs to for easy lookup
+  calculationId String?
+  calculation   AttendanceCalculationHistory? @relation(fields: [calculationId], references: [id], onDelete: SetNull)
+
+  // Status fields
+  isDeducted Boolean @default(false)
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// =============================================
+// PROJECT MANAGEMENT MODELS
+// =============================================
+
+model Project {
+  id          String  @id @unique @default(cuid())
+  title       String
+  slug        String  @unique
+  description String? @db.LongText
+
+  // Project details
+  status    ProjectStatus @default(InProgress)
+  priority  Priority      @default(Medium)
+  startDate DateTime?
+  endDate   DateTime?
+  deadline  DateTime?
+
+  // Project settings
+  isPublic   Boolean? @default(false) // If true, visible to all department members
+  allowGuest Boolean? @default(false)
+
+  // Budget and resources
+  budget Float?
+  spent  Float? @default(0)
+
+  // Relations
+  createdById  String
+  createdBy    UserProfile @relation("ProjectCreatedBy", fields: [createdById], references: [userId], onDelete: Cascade)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  // Project team members
+  teamMembers ProjectMember[]
+
+  // Project content
+  tasks       Task[]
+  comments    ProjectComment[]
+  attachments ProjectAttachment[]
+  favorites   ProjectFavorite[]
+  activities  ProjectActivity[]
+  invitations ProjectInvitation[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdById])
+  @@index([departmentId])
+  @@index([status])
+}
+
+model ProjectMember {
+  id        String      @id @unique @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Member role in project
+  role String @default("Member") // Member, Lead, Contributor, etc.
+
+  // Permissions
+  canCreate Boolean @default(false) // Can be able to create tasks and sub-tasks
+  canEdit   Boolean @default(false) // Can be able to edit all project details
+  canDelete Boolean @default(false) // Can be able to delete the project
+  canAssign Boolean @default(false) // Can be able to assign tasks to others (invite members)
+
+  // Timestamps
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model Task {
+  id          String  @id @unique @default(cuid())
+  title       String
+  description String? @db.LongText
+  code        String? @unique // Task code like "TASK-001"
+
+  // Task details
+  status   TaskStatus @default(InProgress)
+  priority Priority   @default(Medium)
+  taskType TaskType   @default(DailyTask)
+
+  // Dates
+  startDate DateTime?
+  endDate   DateTime?
+  deadline  DateTime?
+
+  // Task metadata
+  estimatedHours Float?
+  actualHours    Float? @default(0)
+  progress       Int?   @default(0) // 0-100 percentage
+  orderIndex     Int?   @default(0) // For manual ordering
+
+  // Relations
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentTaskId String?
+  parentTask   Task?    @relation("SubTasks", fields: [parentTaskId], references: [id])
+
+  // Assignment
+  assignedById String?
+  assignedBy   UserProfile? @relation("TaskAssignedBy", fields: [assignedById], references: [userId])
+  departmentId String?
+  department   Department?  @relation(fields: [departmentId], references: [id])
+
+  // Task content
+  createdById String
+  createdBy   UserProfile      @relation("TaskCreatedBy", fields: [createdById], references: [userId], onDelete: Cascade)
+  subtasks    Task[]           @relation("SubTasks")
+  comments    TaskComment[]
+  attachments TaskAttachment[]
+  favorites   TaskFavorite[]
+  activities  TaskActivity[]
+  timeLogs    TimeLog[]
+  taskMembers TaskMember[]
+
+  // For magazine/story specific fields
+  storyUrl    String?
+  storyTitle  String?
+  contentType String? // "story", "article", "post", etc.
+
+  isApproved   Boolean?     @default(false)
+  approvedById String?
+  approvedBy   UserProfile? @relation("TaskApprovedBy", fields: [approvedById], references: [userId])
+  approvedAt   DateTime?
+
+  isCompleted   Boolean      @default(false)
+  completedById String?
+  completedBy   UserProfile? @relation("TaskCompletedBy", fields: [completedById], references: [userId])
+  completedAt   DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([createdById])
+  @@index([departmentId])
+  @@index([status])
+  @@index([taskType])
+}
+
+model TaskMember {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Member role in task
+  role String @default("Member") // Member, Lead, Contributor, etc.
+
+  // Permissions
+  canEdit   Boolean @default(false) // Can be able to edit all task details
+  canDelete Boolean @default(false) // Can be able to delete the task
+  canAssign Boolean @default(false) // Can be able to assign sub-tasks to others
+
+  // Timestamps
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+}
+
+model TimeLog {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Time tracking
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int? // in minutes
+  description String?   @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model ProjectComment {
+  id        String      @id @unique @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Comment content
+  content  String           @db.LongText
+  parentId String? // For nested comments
+  parent   ProjectComment?  @relation("Replies", fields: [parentId], references: [id])
+  replies  ProjectComment[] @relation("Replies")
+
+  // Metadata
+  isEdited Boolean?  @default(false)
+  editedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([userId])
+}
+
+model TaskComment {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Comment content
+  content  String        @db.LongText
+  parentId String? // For nested comments
+  parent   TaskComment?  @relation("TaskReplies", fields: [parentId], references: [id])
+  replies  TaskComment[] @relation("TaskReplies")
+
+  // Metadata
+  isEdited Boolean?  @default(false)
+  editedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model ProjectAttachment {
+  id        String      @id @unique @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // File details
+  fileName String
+  fileUrl  String
+  fileSize Int? // in bytes
+  fileType String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([userId])
+}
+
+model TaskAttachment {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // File details
+  fileName String
+  fileUrl  String
+  fileSize Int? // in bytes
+  fileType String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model ProjectFavorite {
+  id        String      @id @unique @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model TaskFavorite {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+}
+
+model ProjectActivity {
+  id        String      @id @unique @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Activity details
+  action      ActivityAction
+  targetId    String? // ID of the affected item (task, comment, etc.)
+  targetType  String? // Type of the affected item
+  oldValues   Json? // Previous values
+  newValues   Json? // New values
+  description String         @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([action])
+}
+
+model TaskActivity {
+  id     String      @id @unique @default(cuid())
+  taskId String
+  task   Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Activity details
+  action      ActivityAction
+  targetId    String? // ID of the affected item (subtask, comment, etc.)
+  targetType  String? // Type of the affected item
+  oldValues   Json? // Previous values
+  newValues   Json? // New values
+  description String         @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([action])
+}
+
+model ProjectInvitation {
+  id        String  @id @unique @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Invitation details
+  email  String
+  token  String           @unique
+  role   String           @default("Member")
+  status InvitationStatus @default(Pending)
+
+  // Inviter details
+  invitedById String
+  invitedBy   UserProfile @relation("InvitationSentBy", fields: [invitedById], references: [userId], onDelete: Cascade)
+
+  // Expiry
+  expiresAt DateTime
+
+  // Acceptance
+  acceptedById String?
+  acceptedBy   UserProfile? @relation("InvitationAcceptedBy", fields: [acceptedById], references: [userId])
+  acceptedAt   DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([email])
+  @@index([token])
+  @@index([status])
+}
