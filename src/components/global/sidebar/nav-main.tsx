@@ -30,26 +30,26 @@ export function NavMain({
         Main Menu
       </SidebarGroupLabel>
       <SidebarGroupContent className='flex flex-col gap-2'>
-        <SidebarMenu>
+        <SidebarMenu className='flex gap-2'>
           {items.map((item) => (
             <SidebarMenuItem key={item.label}>
               <Link href={item.href}>
                 <SidebarMenuButton
                   isActive={isActive(item.href)}
                   tooltip={item.label}
-                  className={`cursor-pointer hover:bg-primary-bg hover:text-black dark:hover:text-primary-foreground ${
+                  className={`cursor-pointer hover:bg-primary hover:text-primary-foreground! rounded-lg py-4.5 ${
                     isActive(item.href)
-                      ? "bg-primary-bg! text-black! dark:text-primary-foreground!"
-                      : ""
+                      ? "bg-primary! text-primary-foreground!"
+                      : "text-muted-foreground!"
                   }`}
                 >
                   {item.icon && (
                     <item.icon
-                      className={`${
+                      className={`w-5! h-5! text-xl${
                         isActive(item.href)
-                          ? "text-primary"
+                          ? "text-primary-foreground"
                           : "text-muted-foreground!"
-                      } w-5! h-5!`}
+                      }`}
                     />
                   )}
                   <span>{item.label}</span>

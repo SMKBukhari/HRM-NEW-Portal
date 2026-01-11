@@ -1,12 +1,10 @@
 import {
-  IconBrandOffice,
   IconBriefcase,
   IconCalendarClock,
   IconCalendarTime,
   IconClockDollar,
   IconDashboard,
   IconFileCertificate,
-  IconFolder,
   IconFolderCheck,
   IconFolderExclamation,
   IconHome,

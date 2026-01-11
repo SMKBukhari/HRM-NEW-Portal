@@ -1,4 +1,3 @@
-import { Notifications } from "@prisma/client";
 import { formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,6 +6,7 @@ import { Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { UserImage } from "@/components/global/UserImage";
+import { Notifications } from "@/generated/prisma/client";
 
 type NotificationWithUser = Notifications & {
   user: { fullName: string; userImage: string | null };
