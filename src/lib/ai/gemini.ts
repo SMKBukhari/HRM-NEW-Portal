@@ -3,7 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/prisma";
 
 // Initialize Gemini AI
-const genAI = new GoogleGenerativeAI("AIzaSyACThcmJesW8hVaVQ0TQBD7w7T_e70QJZg");
+// const genAI = new GoogleGenerativeAI("AIzaSyACThcmJesW8hVaVQ0TQBD7w7T_e70QJZg");
+const genAI = new GoogleGenerativeAI("AIzaSyBuAp4y23chf7AQgMIv5YIkf8nbV-b-SnU");
 
 // Professional HR-focused system prompt
 const HRM_SYSTEM_PROMPT = `
@@ -118,13 +119,29 @@ export class GeminiAIService {
         Do not include markdown formatting (like \`\`\`json). Just the raw JSON object.
         
         Fields to extract:
-        - fullName (string)
+        - fullName (string) - MUST be in Title Case (e.g. "John Doe")
         - email (string)
         - contactNumber (string)
         - gender (string: "Male", "Female", or "Other" - guess based on context if obvious, else null)
         - city (string)
         - country (string)
         - DOB (string: YYYY-MM-DD format if found, else null)
+        - education (array of objects):
+          - university (string)
+          - degree (string)
+          - fieldOfStudy (string)
+          - startDate (string: YYYY-MM-DD or YYYY)
+          - endDate (string: YYYY-MM-DD or YYYY or "Present")
+          - grade (string)
+        - jobExperience (array of objects):
+          - jobTitle (string)
+          - companyName (string)
+          - employmentType (string)
+          - location (string)
+          - startDate (string: YYYY-MM-DD)
+          - endDate (string: YYYY-MM-DD or "Present")
+          - currentlyWorking (boolean)
+          - description (string)
       `;
 
       const imagePart = {

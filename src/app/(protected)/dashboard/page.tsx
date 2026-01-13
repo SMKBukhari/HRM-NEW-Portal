@@ -51,8 +51,8 @@ const page = async () => {
     user?.contactNumber,
     user?.city,
     user?.country,
-    user?.jobExperience,
-    user?.education.length,
+    user?.jobExperience?.length,
+    user?.education?.length,
     user?.resumeUrl,
   ];
 
@@ -65,6 +65,10 @@ const page = async () => {
   const totalFields = requiredFieldsForApply.length;
   const completedFields = requiredFieldsForApply.filter(Boolean).length;
   const isComplete = requiredFieldsForApply.every(Boolean);
+
+  if (!isComplete) {
+    redirect("/setup");
+  }
 
   const interviewDateTime = jobApplications[0]?.interviewDate;
   const formattedDate = interviewDateTime
