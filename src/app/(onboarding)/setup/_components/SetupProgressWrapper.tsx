@@ -7,7 +7,7 @@ import { ProgressStep } from "@/components/global/progress-steps/types";
 import { ResumeUpload } from "./ResumeUpload";
 import StepPersonal from "./StepPersonal";
 import StepExperience from "./StepExperience";
-import StepEmployment from "./StepEmployment";
+import StepSkills from "./StepSkills";
 
 export function SetupProgressWrapper({
   children,
@@ -38,9 +38,9 @@ export function SetupProgressWrapper({
       content: <StepExperience />,
     },
     {
-      id: "employment",
-      title: "Employment & Payroll Details",
-      content: <StepEmployment />,
+      id: "skills",
+      title: "Skills & Social Links",
+      content: <StepSkills />,
     },
   ];
 

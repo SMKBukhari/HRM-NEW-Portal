@@ -111,7 +111,22 @@ export const JobExperienceSchema = z.object({
   description: z.string().optional(),
 });
 
+export const SkillSchema = z.object({
+  name: z.string().min(1, { error: "Skill name is required" }),
+  level: z.string().min(1, { error: "Proficiency level is required" }),
+});
+
+export const SocialLinkSchema = z.object({
+  platform: z.string().min(1, { error: "Platform name is required" }),
+  url: z.string().url({ message: "Please enter a valid URL" }),
+});
+
 export const ExperienceStepSchema = z.object({
   education: z.array(EducationSchema),
   jobExperience: z.array(JobExperienceSchema),
+});
+
+export const SkillsStepSchema = z.object({
+  skills: z.array(SkillSchema),
+  socialLinks: z.array(SocialLinkSchema),
 });

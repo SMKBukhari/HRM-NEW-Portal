@@ -25,6 +25,18 @@ export interface JobExperience {
   description: string;
 }
 
+export interface Skill {
+  id: string;
+  name: string;
+  level: string;
+}
+
+export interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+}
+
 export interface PersonalDetails {
   fullName: string;
   email: string;
@@ -65,6 +77,8 @@ interface SetupState {
   benefitsDetails: BenefitsDetails;
   education: Education[];
   jobExperience: JobExperience[];
+  skills: Skill[];
+  socialLinks: SocialLink[];
   resumeUrl: string;
   isResumeUploading: boolean;
 
@@ -74,6 +88,8 @@ interface SetupState {
   setBenefitsDetails: (details: Partial<BenefitsDetails>) => void;
   setEducation: (education: Education[]) => void;
   setJobExperience: (experience: JobExperience[]) => void;
+  setSkills: (skills: Skill[]) => void;
+  setSocialLinks: (socialLinks: SocialLink[]) => void;
   setResumeUrl: (url: string) => void;
   setIsResumeUploading: (isUploading: boolean) => void;
   resetStore: () => void;
@@ -115,6 +131,8 @@ export const useSetupStore = create<SetupState>()(
       },
       education: [],
       jobExperience: [],
+      skills: [],
+      socialLinks: [],
       resumeUrl: "",
       isResumeUploading: false,
 
@@ -133,6 +151,8 @@ export const useSetupStore = create<SetupState>()(
         })),
       setEducation: (education) => set({ education }),
       setJobExperience: (jobExperience) => set({ jobExperience }),
+      setSkills: (skills) => set({ skills }),
+      setSocialLinks: (socialLinks) => set({ socialLinks }),
       setResumeUrl: (resumeUrl) => set({ resumeUrl }),
       setIsResumeUploading: (isUploading) =>
         set({ isResumeUploading: isUploading }),
@@ -171,6 +191,8 @@ export const useSetupStore = create<SetupState>()(
           },
           education: [],
           jobExperience: [],
+          skills: [],
+          socialLinks: [],
           resumeUrl: "",
           isResumeUploading: false,
         }),
@@ -184,6 +206,8 @@ export const useSetupStore = create<SetupState>()(
         benefitsDetails: state.benefitsDetails,
         education: state.education,
         jobExperience: state.jobExperience,
+        skills: state.skills,
+        socialLinks: state.socialLinks,
         resumeUrl: state.resumeUrl,
       }),
       onRehydrateStorage: () => (state) => {
