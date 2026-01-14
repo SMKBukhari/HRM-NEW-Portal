@@ -130,17 +130,19 @@ export class GeminiAIService {
           - university (string)
           - degree (string)
           - fieldOfStudy (string)
-          - startDate (string: YYYY-MM-DD or YYYY)
-          - endDate (string: YYYY-MM-DD or YYYY or "Present")
           - grade (string)
+          - startDate (string: YYYY-MM-DD or YYYY)
+          - currentlyStudying (boolean) - true when end date is undefined or not given, and when true then end date should be undefined or not given
+          - endDate (string: YYYY-MM-DD or YYYY)
+          - description (string)
         - jobExperience (array of objects):
           - jobTitle (string)
           - companyName (string)
           - employmentType (string)
           - location (string)
           - startDate (string: YYYY-MM-DD)
-          - endDate (string: YYYY-MM-DD or "Present")
-          - currentlyWorking (boolean)
+          - endDate (string: YYYY-MM-DD or YYYY)
+          - currentlyWorking (boolean) - true when end date is undefined or not given, and when true then end date should be undefined or not given
           - description (string)
       `;
 

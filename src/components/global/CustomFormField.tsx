@@ -383,7 +383,7 @@ const RenderInput = <T extends FieldValues>({
     case FormFieldType.CHECKBOX:
       return (
         <FormControl>
-          <div className='flex items-center gap-4 bg-sidebar/50!'>
+          <div className='flex items-center gap-4'>
             <Checkbox
               id={props.name}
               checked={field.value as boolean}

@@ -5,10 +5,12 @@ export interface Education {
   id: string;
   university: string;
   degree: string;
-  fieldOfStudy: string;
-  startDate: string;
-  endDate: string;
   grade: string;
+  fieldOfStudy: string;
+  startDate: Date | undefined;
+  currentlyStudying: boolean;
+  endDate: Date | undefined;
+  description: string;
 }
 
 export interface JobExperience {
@@ -17,8 +19,8 @@ export interface JobExperience {
   companyName: string;
   employmentType: string;
   location: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
   currentlyWorking: boolean;
   description: string;
 }

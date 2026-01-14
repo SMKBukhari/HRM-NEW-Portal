@@ -78,3 +78,40 @@ export const PersonalDetailsSchema = z.object({
   city: z.string().min(3, { error: "City is required" }),
   country: z.string().min(3, { error: "Country is required" }),
 });
+
+export const EducationSchema = z.object({
+  university: z.string().min(1, { error: "University is required" }),
+  degree: z.string().min(1, { error: "Degree is required" }),
+  fieldOfStudy: z.string().min(1, { error: "Field of Study is required" }),
+  grade: z.string().optional(),
+  startDate: z.date({
+    error: (iss) =>
+      iss.input === undefined
+        ? "Start Date is required"
+        : "Please select a valid date",
+  }),
+  currentlyStudying: z.boolean().optional(),
+  endDate: z.date().optional(),
+  description: z.string().optional(),
+});
+
+export const JobExperienceSchema = z.object({
+  jobTitle: z.string().min(1, { error: "Job Title is required" }),
+  companyName: z.string().min(1, { error: "Company Name is required" }),
+  employmentType: z.string().min(1, { error: "Employment Type is required" }),
+  location: z.string().min(1, { error: "Location is required" }),
+  startDate: z.date({
+    error: (iss) =>
+      iss.input === undefined
+        ? "Start Date is required"
+        : "Please select a valid date",
+  }),
+  currentlyWorking: z.boolean().optional(),
+  endDate: z.date().optional(),
+  description: z.string().optional(),
+});
+
+export const ExperienceStepSchema = z.object({
+  education: z.array(EducationSchema),
+  jobExperience: z.array(JobExperienceSchema),
+});

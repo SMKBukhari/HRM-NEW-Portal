@@ -1,317 +1,442 @@
 "use client";
 
-import React from "react";
-import { useSetupStore, Education, JobExperience } from "@/store/useSetupStore";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useEffect } from "react";
+import { useSetupStore } from "@/store/useSetupStore";
 import { Button } from "@/components/ui/button";
 import { useProgressSteps } from "@/components/global/progress-steps/ProgressStepsContext";
-import { Plus, Trash2, Briefcase, GraduationCap } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Plus,
+  Trash2,
+  Briefcase,
+  GraduationCap,
+  University,
+  Book,
+  Medal,
+  BriefcaseBusiness,
+  Building2,
+  MapPin,
+  Clock,
+} from "lucide-react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { ExperienceStepSchema } from "@/schemas";
+import { Form } from "@/components/ui/form";
+import CustomFormField from "@/components/global/CustomFormField";
+import { FormFieldType } from "@/lib/enums";
+import { Separator } from "@/components/ui/separator";
 
 const StepExperience = () => {
   const { education, jobExperience, setEducation, setJobExperience } =
     useSetupStore();
   const { goNext, goPrev } = useProgressSteps();
 
-  // --- Education Handlers ---
-  const addEducation = () => {
-    setEducation([
-      ...education,
-      {
-        id: crypto.randomUUID(),
-        university: "",
-        degree: "",
-        fieldOfStudy: "",
-        startDate: "",
-        endDate: "",
-        grade: "",
-      },
-    ]);
+  console.log("jobExperience", jobExperience);
+  console.log("education", education);
+
+  const form = useForm<z.infer<typeof ExperienceStepSchema>>({
+    resolver: zodResolver(ExperienceStepSchema),
+    defaultValues: {
+      education: education.length
+        ? education.map((edu) => ({
+            ...edu,
+            startDate: edu.startDate ? new Date(edu.startDate) : undefined,
+            endDate: edu.endDate ? new Date(edu.endDate) : undefined,
+          }))
+        : [
+            {
+              university: "",
+              degree: "",
+              fieldOfStudy: "",
+              grade: "",
+              startDate: undefined,
+              currentlyStudying: false,
+              endDate: undefined,
+              description: "",
+            },
+          ],
+      jobExperience: jobExperience.length
+        ? jobExperience.map((exp) => ({
+            ...exp,
+            startDate: exp.startDate ? new Date(exp.startDate) : undefined,
+            endDate: exp.endDate ? new Date(exp.endDate) : undefined,
+          }))
+        : [
+            {
+              jobTitle: "",
+              companyName: "",
+              employmentType: "",
+              location: "",
+              startDate: undefined,
+              currentlyWorking: false,
+              endDate: undefined,
+              description: "",
+            },
+          ],
+    },
+  });
+
+  const {
+    fields: eduFields,
+    append: appendEdu,
+    remove: removeEdu,
+  } = useFieldArray({
+    control: form.control,
+    name: "education",
+  });
+
+  const {
+    fields: expFields,
+    append: appendExp,
+    remove: removeExp,
+  } = useFieldArray({
+    control: form.control,
+    name: "jobExperience",
+  });
+
+  // Helper to safely parse Date to YYYY-MM-DD string for HTML input
+  const formatDateForInput = (date: Date | undefined | string) => {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
   };
 
-  const removeEducation = (id: string) => {
-    setEducation(education.filter((edu) => edu.id !== id));
-  };
+  const onSubmit = (values: z.infer<typeof ExperienceStepSchema>) => {
+    // 1. Generate IDs for new items
+    // 2. Ensure booleans are strict booleans (handle undefined -> false)
 
-  const updateEducation = (
-    id: string,
-    field: keyof Education,
-    value: string
-  ) => {
-    setEducation(
-      education.map((edu) => (edu.id === id ? { ...edu, [field]: value } : edu))
-    );
-  };
+    const educationWithIds = values.education.map((edu: any) => ({
+      ...edu,
+      id: edu.id || crypto.randomUUID(),
+      currentlyStudying: !!edu.currentlyStudying, // Force boolean
+    }));
 
-  // --- Experience Handlers ---
-  const addExperience = () => {
-    setJobExperience([
-      ...jobExperience,
-      {
-        id: crypto.randomUUID(),
-        jobTitle: "",
-        companyName: "",
-        employmentType: "",
-        location: "",
-        startDate: "",
-        endDate: "",
-        currentlyWorking: false,
-        description: "",
-      },
-    ]);
-  };
+    const experienceWithIds = values.jobExperience.map((exp: any) => ({
+      ...exp,
+      id: exp.id || crypto.randomUUID(),
+      currentlyWorking: !!exp.currentlyWorking, // Force boolean
+    }));
 
-  const removeExperience = (id: string) => {
-    setJobExperience(jobExperience.filter((exp) => exp.id !== id));
-  };
-
-  const updateExperience = (
-    id: string,
-    field: keyof JobExperience,
-    value: any
-  ) => {
-    setJobExperience(
-      jobExperience.map((exp) =>
-        exp.id === id ? { ...exp, [field]: value } : exp
-      )
-    );
+    setEducation(educationWithIds);
+    setJobExperience(experienceWithIds);
+    goNext();
   };
 
   return (
-    <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
-      {/* --- Education Section --- */}
-      <div className='space-y-4'>
-        <div className='flex items-center justify-between'>
-          <h3 className='text-lg font-semibold flex items-center gap-2'>
-            <GraduationCap className='h-5 w-5 text-primary' /> Education
-          </h3>
-          <Button onClick={addEducation} variant='outline' size='sm'>
-            <Plus className='h-4 w-4 mr-2' /> Add Education
-          </Button>
-        </div>
+    <div className='md:h-full h-auto flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500'>
+      <div className='shrink-0 md:mb-5 mb-2'>
+        <h3 className='md:font-semibold font-bold md:text-2xl text-lg'>
+          Education & Experience
+        </h3>
+        <p className='font-medium md:text-base text-sm text-muted-foreground'>
+          Share your academic and professional journey
+        </p>
+        <Separator className='my-5 shrink-0' />
+      </div>
 
-        {education.length === 0 && (
-          <div className='text-center py-8 border-2 border-dashed rounded-xl text-muted-foreground text-sm'>
-            No education details added yet.
-          </div>
-        )}
-
-        <div className='space-y-6'>
-          {education.map((edu, index) => (
-            <div
-              key={edu.id}
-              className='relative p-6 rounded-xl border bg-card/50 space-y-4'
-            >
-              <Button
-                variant='ghost'
-                size='icon'
-                className='absolute top-2 right-2 text-destructive hover:text-destructive/80'
-                onClick={() => removeEducation(edu.id)}
-              >
-                <Trash2 className='h-4 w-4' />
-              </Button>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label>University / Institute</Label>
-                  <Input
-                    value={edu.university}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "university", e.target.value)
-                    }
-                    placeholder='Harvard University'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Degree</Label>
-                  <Input
-                    value={edu.degree}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "degree", e.target.value)
-                    }
-                    placeholder='Bachelor of Science'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Field of Study</Label>
-                  <Input
-                    value={edu.fieldOfStudy}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "fieldOfStudy", e.target.value)
-                    }
-                    placeholder='Computer Science'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Grade / GPA</Label>
-                  <Input
-                    value={edu.grade}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "grade", e.target.value)
-                    }
-                    placeholder='3.8'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Start Date</Label>
-                  <Input
-                    type='date'
-                    value={edu.startDate}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "startDate", e.target.value)
-                    }
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>End Date</Label>
-                  <Input
-                    type='date'
-                    value={edu.endDate}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "endDate", e.target.value)
-                    }
-                  />
-                </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className='flex flex-col flex-1 md:min-h-0 h-full'
+        >
+          <div className='flex-1 md:overflow-y-auto pr-2'>
+            {/* --- Education Section --- */}
+            <div className='space-y-4 mb-8'>
+              <div className='flex md:flex-row flex-col md:items-center justify-between w-full gap-2'>
+                <h3 className='text-lg font-semibold flex items-center gap-2'>
+                  <GraduationCap className='h-5 w-5 text-primary' /> Education
+                </h3>
+                <Button
+                  type='button'
+                  onClick={() =>
+                    appendEdu({
+                      university: "",
+                      degree: "",
+                      fieldOfStudy: "",
+                      grade: "",
+                      startDate: undefined, // undefined works fine with z.coerce
+                      currentlyStudying: false,
+                      endDate: undefined,
+                      description: "",
+                    } as any)
+                  }
+                  variant='outline'
+                  size='sm'
+                >
+                  <Plus className='h-4 w-4 mr-2' /> Add Education
+                </Button>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      <div className='h-px bg-border' />
+              {eduFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className='relative p-6 rounded-xl border-primary-border border space-y-4'
+                >
+                  {eduFields.length > 1 && (
+                    <Button
+                      type='button'
+                      variant='ghosted'
+                      size='icon'
+                      className='absolute top-2 right-2 text-destructive hover:text-destructive/80'
+                      onClick={() => removeEdu(index)}
+                    >
+                      <Trash2 className='h-4 w-4' />
+                    </Button>
+                  )}
 
-      {/* --- Experience Section --- */}
-      <div className='space-y-4'>
-        <div className='flex items-center justify-between'>
-          <h3 className='text-lg font-semibold flex items-center gap-2'>
-            <Briefcase className='h-5 w-5 text-primary' /> Job Experience
-          </h3>
-          <Button onClick={addExperience} variant='outline' size='sm'>
-            <Plus className='h-4 w-4 mr-2' /> Add Experience
-          </Button>
-        </div>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.university`}
+                      label='University / Institute'
+                      placeholder='Harvard University'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={University}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.degree`}
+                      label='Degree'
+                      placeholder='Bachelor of Science'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={GraduationCap}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.fieldOfStudy`}
+                      label='Field of Study'
+                      placeholder='Computer Science'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={Book}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.grade`}
+                      label='Grade / GPA'
+                      placeholder='3.8'
+                      fieldType={FormFieldType.INPUT}
+                      icon={Medal}
+                    />
 
-        {jobExperience.length === 0 && (
-          <div className='text-center py-8 border-2 border-dashed rounded-xl text-muted-foreground text-sm'>
-            No job experience added yet.
-          </div>
-        )}
+                    {/* START DATE */}
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.startDate`}
+                      label='Start Date'
+                      placeholder='Select Start Date'
+                      isRequired
+                      fieldType={FormFieldType.DATE_PICKER}
+                    />
 
-        <div className='space-y-6'>
-          {jobExperience.map((exp, index) => (
-            <div
-              key={exp.id}
-              className='relative p-6 rounded-xl border bg-card/50 space-y-4'
-            >
+                    {/* END DATE */}
+                    <CustomFormField
+                      control={form.control}
+                      name={`education.${index}.endDate`}
+                      label='End Date'
+                      placeholder='Select End Date'
+                      fieldType={FormFieldType.DATE_PICKER}
+                    />
+
+                    <div className='md:col-span-2'>
+                      <CustomFormField
+                        control={form.control}
+                        name={`education.${index}.currentlyStudying`}
+                        label='I am currently studying here'
+                        fieldType={FormFieldType.CHECKBOX}
+                      />
+                    </div>
+                    <div className='md:col-span-2'>
+                      <CustomFormField
+                        control={form.control}
+                        name={`education.${index}.description`}
+                        label='Description'
+                        placeholder='Describe your achievements...'
+                        fieldType={FormFieldType.TEXTAREA}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
               <Button
-                variant='ghost'
-                size='icon'
-                className='absolute top-2 right-2 text-destructive hover:text-destructive/80'
-                onClick={() => removeExperience(exp.id)}
+                type='button'
+                onClick={() =>
+                  appendEdu({
+                    university: "",
+                    degree: "",
+                    fieldOfStudy: "",
+                    grade: "",
+                    startDate: undefined,
+                    currentlyStudying: false,
+                    endDate: undefined,
+                    description: "",
+                  } as any)
+                }
+                variant='outline'
+                className='w-full border-dashed border-primary text-primary hover:bg-primary/5'
               >
-                <Trash2 className='h-4 w-4' />
+                <Plus className='h-4 w-4 mr-2' /> Add Education
               </Button>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label>Job Title</Label>
-                  <Input
-                    value={exp.jobTitle}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "jobTitle", e.target.value)
-                    }
-                    placeholder='Software Engineer'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Company Name</Label>
-                  <Input
-                    value={exp.companyName}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "companyName", e.target.value)
-                    }
-                    placeholder='Tech Corp'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Location</Label>
-                  <Input
-                    value={exp.location}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "location", e.target.value)
-                    }
-                    placeholder='San Francisco, CA'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Employment Type</Label>
-                  <Input
-                    value={exp.employmentType}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "employmentType", e.target.value)
-                    }
-                    placeholder='Full-time'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Start Date</Label>
-                  <Input
-                    type='date'
-                    value={exp.startDate}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "startDate", e.target.value)
-                    }
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>End Date</Label>
-                  <Input
-                    type='date'
-                    disabled={exp.currentlyWorking}
-                    value={exp.endDate}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "endDate", e.target.value)
-                    }
-                  />
-                </div>
-                <div className='flex items-center space-x-2 md:col-span-2'>
-                  <Checkbox
-                    id={`current-${exp.id}`}
-                    checked={exp.currentlyWorking}
-                    onCheckedChange={(checked) =>
-                      updateExperience(exp.id, "currentlyWorking", checked)
-                    }
-                  />
-                  <Label htmlFor={`current-${exp.id}`}>
-                    I am currently working here
-                  </Label>
-                </div>
-                <div className='space-y-2 md:col-span-2'>
-                  <Label>Description</Label>
-                  <Textarea
-                    value={exp.description}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "description", e.target.value)
-                    }
-                    placeholder='Describe your responsibilities...'
-                  />
-                </div>
-              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className='flex justify-between pt-4'>
-        <Button variant='outline' onClick={goPrev} size='lg'>
-          Previous
-        </Button>
-        <Button onClick={goNext} size='lg'>
-          Next Step
-        </Button>
-      </div>
+            <div className='h-px bg-border mb-8' />
+
+            {/* --- Experience Section --- */}
+            <div className='space-y-4'>
+              <div className='flex md:flex-row flex-col md:items-center justify-between w-full gap-2'>
+                <h3 className='text-lg font-semibold flex items-center gap-2'>
+                  <Briefcase className='h-5 w-5 text-primary' /> Job Experience
+                </h3>
+                <Button
+                  type='button'
+                  onClick={() =>
+                    appendExp({
+                      jobTitle: "",
+                      companyName: "",
+                      employmentType: "",
+                      location: "",
+                      startDate: undefined,
+                      endDate: undefined,
+                      currentlyWorking: false,
+                      description: "",
+                    } as any)
+                  }
+                  variant='outline'
+                  size='sm'
+                >
+                  <Plus className='h-4 w-4 mr-2' /> Add Experience
+                </Button>
+              </div>
+
+              {expFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className='relative p-6 rounded-xl border-primary-border border space-y-4'
+                >
+                  {expFields.length > 1 && (
+                    <Button
+                      type='button'
+                      variant='ghosted'
+                      size='icon'
+                      className='absolute top-2 right-2 text-destructive hover:text-destructive/80'
+                      onClick={() => removeExp(index)}
+                    >
+                      <Trash2 className='h-4 w-4' />
+                    </Button>
+                  )}
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.jobTitle`}
+                      label='Job Title'
+                      placeholder='Software Engineer'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={BriefcaseBusiness}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.companyName`}
+                      label='Company Name'
+                      placeholder='Tech Corp'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={Building2}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.location`}
+                      label='Location'
+                      placeholder='San Francisco, CA'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={MapPin}
+                    />
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.employmentType`}
+                      label='Employment Type'
+                      placeholder='Full-time'
+                      isRequired
+                      fieldType={FormFieldType.INPUT}
+                      icon={Clock}
+                    />
+
+                    {/* START DATE */}
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.startDate`}
+                      label='Start Date'
+                      placeholder='Select Start Date'
+                      isRequired
+                      fieldType={FormFieldType.DATE_PICKER}
+                    />
+
+                    {/* END DATE */}
+                    <CustomFormField
+                      control={form.control}
+                      name={`jobExperience.${index}.endDate`}
+                      label='End Date'
+                      placeholder='Select End Date'
+                      fieldType={FormFieldType.DATE_PICKER}
+                    />
+
+                    <div className='md:col-span-2'>
+                      <CustomFormField
+                        control={form.control}
+                        name={`jobExperience.${index}.currentlyWorking`}
+                        label='I am currently working here'
+                        fieldType={FormFieldType.CHECKBOX}
+                      />
+                    </div>
+                    <div className='md:col-span-2'>
+                      <CustomFormField
+                        control={form.control}
+                        name={`jobExperience.${index}.description`}
+                        label='Description'
+                        placeholder='Describe your responsibilities...'
+                        fieldType={FormFieldType.TEXTAREA}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Button
+                type='button'
+                onClick={() =>
+                  appendExp({
+                    jobTitle: "",
+                    companyName: "",
+                    employmentType: "",
+                    location: "",
+                    startDate: undefined,
+                    endDate: undefined,
+                    currentlyWorking: false,
+                    description: "",
+                  } as any)
+                }
+                variant='outline'
+                className='w-full border-dashed border-primary text-primary hover:bg-primary/5'
+              >
+                <Plus className='h-4 w-4 mr-2' /> Add Experience
+              </Button>
+            </div>
+          </div>
+
+          <div className='shrink-0 flex justify-between pt-4 bg-background'>
+            <Button type='button' variant='outline' onClick={goPrev} size='lg'>
+              Previous
+            </Button>
+            <Button type='submit' size='lg'>
+              Next Step
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 };
