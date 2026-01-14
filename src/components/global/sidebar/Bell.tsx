@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Notifications, UserProfile } from "@prisma/client";
 import { Bell, CheckCheck, Loader2, RefreshCw } from "lucide-react";
 import {
   Popover,
@@ -21,6 +20,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { UserProfile } from "@/generated/prisma/browser";
+import { Notifications } from "@/generated/prisma/client";
 
 interface BellNotificationProps {
   user: UserProfile | null;

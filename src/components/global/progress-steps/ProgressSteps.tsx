@@ -21,7 +21,8 @@ export function ProgressSteps({
   clickable = true,
   lockFutureSteps = true,
   onStepChange,
-}: Props) {
+  variant = "vertical",
+}: Props & { variant?: "vertical" | "horizontal" }) {
   const { steps, currentIndex, setCurrentIndex, isComplete } =
     useProgressSteps();
 
@@ -39,6 +40,55 @@ export function ProgressSteps({
     setCurrentIndex(idx);
     onStepChange?.(idx);
   };
+
+  if (variant === "horizontal") {
+    return (
+      <div className={`w-full ${className}`}>
+        <div className='flex items-center justify-between relative'>
+          {/* Background Line */}
+          <div className='absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-muted-foreground/20 z-0' />
+
+          {/* Active Line Progress */}
+          <div
+            className='absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-primary z-0 transition-all duration-300'
+            style={{ width: `${(currentIndex / (steps.length - 1)) * 100}%` }}
+          />
+
+          {steps.map((step, idx) => {
+            const active = idx === currentIndex;
+            const done = isComplete(idx);
+            const rowClickable = canGoTo(idx);
+
+            return (
+              <button
+                key={step.id}
+                type='button'
+                onClick={() => handleClick(idx)}
+                disabled={!rowClickable}
+                className={`
+                  relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 bg-background
+                  ${
+                    active
+                      ? "border-primary text-primary"
+                      : done
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-muted-foreground/30 text-muted-foreground"
+                  }
+                  ${rowClickable ? "cursor-pointer" : "cursor-not-allowed"}
+                `}
+              >
+                {done ? (
+                  <div className='h-2.5 w-2.5 rounded-full bg-current' />
+                ) : (
+                  <span className='text-xs font-medium'>{idx + 1}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`w-full ${className}`}>
@@ -77,7 +127,7 @@ export function ProgressSteps({
                   disabled={!rowClickable}
                   aria-current={active ? "step" : undefined}
                   className={[
-                    "mt-2.5 h-4 w-4 rounded-full ring-4 transition",
+                    "h-4 w-4 rounded-full ring-4 transition",
                     dotClasses,
                     rowClickable
                       ? "cursor-pointer"
@@ -87,7 +137,11 @@ export function ProgressSteps({
 
                 {/* Connector line */}
                 {idx !== steps.length - 1 && (
-                  <div className='my-1 h-14 w-px bg-muted-foreground/40' />
+                  <div
+                    className={`my-1 h-14 w-px bg-muted-foreground/40 ${
+                      done ? "bg-primary" : ""
+                    }`}
+                  />
                 )}
               </div>
 
@@ -103,7 +157,7 @@ export function ProgressSteps({
                 ].join(" ")}
               >
                 <div
-                  className={`lg:text-xl md:text-lg text-sm font-semibold leading-6 ${textClasses}`}
+                  className={`lg:text-lg md:text-base text-sm font-semibold leading-8 -mt-2 ${textClasses}`}
                 >
                   {step.title}
                   {step.isOptional ? (

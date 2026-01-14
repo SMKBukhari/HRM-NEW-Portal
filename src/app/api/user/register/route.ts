@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { SignUpSchema } from "@/schemas"; // Base schema import if possible, or re-define validation
-import { NotificationCreator } from "@prisma/client";
+import { NotificationCreator } from "@/generated/prisma/enums";
 
 export const POST = async (req: Request) => {
   try {

@@ -21,10 +21,12 @@ export function ProgressStepsProvider({
   steps,
   initialIndex = 0,
   children,
+  onStepChange,
 }: {
   steps: ProgressStep[];
   initialIndex?: number;
   children: React.ReactNode;
+  onStepChange?: (index: number) => void;
 }) {
   const safeInitial = Math.min(
     Math.max(initialIndex, 0),
@@ -32,12 +34,20 @@ export function ProgressStepsProvider({
   );
   const [currentIndex, setCurrentIndex] = useState<number>(safeInitial);
 
+  // Sync internal state if initialIndex changes (e.g. from store hydration)
+  React.useEffect(() => {
+    setCurrentIndex(
+      Math.min(Math.max(initialIndex, 0), Math.max(steps.length - 1, 0))
+    );
+  }, [initialIndex, steps.length]);
+
   const value = useMemo<ProgressStepsContextValue>(() => {
     const currentStep = steps[currentIndex] ?? null;
 
     const setIndex = (idx: number) => {
       const next = Math.min(Math.max(idx, 0), Math.max(steps.length - 1, 0));
       setCurrentIndex(next);
+      onStepChange?.(next);
     };
 
     return {

@@ -61,3 +61,15 @@ export const ResetPasswordSchema = z
     message: "Passwords do not match",
     path: ["ConfirmPassword"],
   });
+
+export const PersonalDetailsSchema = z.object({
+  fullName: z.string().min(1, { message: "Full Name is required" }),
+  email: z.email({ message: "Invalid email address" }),
+  contactNumber: z.string().min(1, { message: "Contact Number is required" }),
+  gender: z.string().min(1, { message: "Gender is required" }),
+  dob: z.string().min(1, { message: "Date of Birth is required" }),
+  cnic: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+});

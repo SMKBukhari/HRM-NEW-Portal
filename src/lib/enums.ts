@@ -10,5 +10,8 @@ export enum FormFieldType {
   FILE_INPUT = "fileInput",
   CURRENCY_INPUT = "currencyInput",
   NUMBER_INPUT = "numberInput",
+  RADIO_GROUP = "RADIO_GROUP",
+  CNIC = "CNIC",
+  PHONE = "PHONE",
   SKELETON = "skeleton",
 }

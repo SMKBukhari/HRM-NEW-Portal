@@ -28,7 +28,7 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"; // <--- Added Imports
+} from "@/components/ui/input-otp";
 import { CalendarIcon, Eye, EyeOff, Minus, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
@@ -37,6 +37,15 @@ import { FormFieldType } from "@/lib/enums";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { RadioGroup } from "../ui/radio-group";
+import {
+  cnicDigitsCount,
+  COUNTRIES,
+  CountryPhone,
+  formatCNIC,
+  guessDefaultCountry,
+  onlyDigits,
+} from "@/lib/helpers/fieldsHelpers";
 
 // Types for date picker configurations
 interface DatePickerConfig {
@@ -75,14 +84,20 @@ interface CustomFormFieldProps<T extends FieldValues> {
   onChange?: (value: FieldPathValue<T, FieldPath<T>>) => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  options?: { value: string; label: string; color?: string }[];
+  options?: {
+    value: string;
+    label: string;
+    color?: string;
+    disabled?: boolean;
+  }[];
+  phoneCountries?: CountryPhone[];
   className?: string;
   defaultValue?: FieldPathValue<T, FieldPath<T>>;
 
   // Date picker specific props
   datePickerConfig?: DatePickerConfig | DateRangePickerConfig;
   numberOfMonths?: number;
-  captionLayout?: "dropdown" | "buttons" | "dropdown-buttons";
+  captionLayout?: "dropdown" | "buttons" | "dropdown-buttons" | "label";
 }
 
 interface RenderInputProps<T extends FieldValues> {
@@ -400,7 +415,7 @@ const RenderInput = <T extends FieldValues>({
               <Button
                 variant='outline'
                 className={cn(
-                  "w-full justify-start text-left font-normal rounded-lg border",
+                  "w-full justify-start text-left font-normal rounded-lg border bg-transparent hover:bg-transparent h-11",
                   getBorderClass(),
                   !current && "text-muted-foreground"
                 )}
@@ -423,6 +438,7 @@ const RenderInput = <T extends FieldValues>({
               align='start'
             >
               <Calendar
+                {...getCalendarProps()}
                 mode='single'
                 selected={current ?? undefined}
                 onSelect={(date: Date | undefined) => {
@@ -430,9 +446,11 @@ const RenderInput = <T extends FieldValues>({
                     (date ?? null) as FieldPathValue<T, FieldPath<T>>
                   );
                 }}
+                fromYear={1900}
+                toYear={2100}
+                captionLayout='dropdown'
                 initialFocus
                 disabled={config?.disabledDays}
-                {...getCalendarProps()}
               />
             </PopoverContent>
           </Popover>
@@ -484,6 +502,7 @@ const RenderInput = <T extends FieldValues>({
               align='start'
             >
               <Calendar
+                {...getCalendarProps()}
                 mode='range'
                 selected={
                   from || to
@@ -496,7 +515,6 @@ const RenderInput = <T extends FieldValues>({
                 }}
                 initialFocus
                 disabled={config?.disabledDays}
-                {...getCalendarProps()}
               />
             </PopoverContent>
           </Popover>
@@ -587,6 +605,217 @@ const RenderInput = <T extends FieldValues>({
           </div>
         </div>
       );
+    case FormFieldType.RADIO_GROUP: {
+      const current = (field.value as string) ?? "";
+
+      return (
+        <motion.div animate={error ? shakeAnimation : {}}>
+          <FormControl>
+            <RadioGroup
+              value={current}
+              onValueChange={(val) =>
+                handleChange(val as FieldPathValue<T, FieldPath<T>>)
+              }
+              className='flex flex-wrap gap-3'
+            >
+              {props.options?.map((opt) => {
+                const active = current === opt.value;
+
+                return (
+                  <motion.button
+                    key={opt.value}
+                    type='button'
+                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ y: -1 }}
+                    onClick={() => {
+                      if (opt.disabled) return;
+                      handleChange(
+                        opt.value as FieldPathValue<T, FieldPath<T>>
+                      );
+                    }}
+                    className={cn(
+                      "flex-1",
+                      "flex items-center justify-between gap-4",
+                      "rounded-lg px-5 py-4",
+                      "transition-all duration-200",
+                      "border cursor-pointer",
+                      active
+                        ? "bg-primary/10 border-primary"
+                        : "border-primary-border hover:border-primary",
+                      error && !active ? "border-primary-danger/40" : "",
+                      opt.disabled && "opacity-60 cursor-not-allowed"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "text-sm font-medium",
+                        active ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      {opt.label}
+                    </span>
+
+                    {/* Right-side circle indicator (like screenshot) */}
+                    <span
+                      className={cn(
+                        "h-5 w-5 rounded-full flex items-center justify-center border",
+                        active
+                          ? "border-primary"
+                          : "border-muted-foreground/30",
+                        error && !active ? "border-primary-danger" : ""
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "h-3 w-3 rounded-full transition-transform",
+                          active ? "bg-primary scale-100" : "scale-0"
+                        )}
+                      />
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </RadioGroup>
+          </FormControl>
+        </motion.div>
+      );
+    }
+    case FormFieldType.CNIC: {
+      const value = (field.value as string) ?? "";
+
+      return (
+        <motion.div
+          animate={error ? shakeAnimation : {}}
+          className={cn(
+            "flex rounded-lg border transition-all items-center",
+            getBorderClass()
+          )}
+        >
+          {renderIcon()}
+          <FormControl>
+            <Input
+              inputMode='numeric'
+              autoComplete='off'
+              placeholder={props.placeholder ?? "12345-1234567-1"}
+              value={value}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={(e) => {
+                const formatted = formatCNIC(e.target.value);
+                handleChange(formatted as FieldPathValue<T, FieldPath<T>>);
+              }}
+              className='shad-input border-none'
+            />
+          </FormControl>
+
+          {/* Small hint badge (optional) */}
+          <div className='px-3 text-xs text-muted-foreground select-none'>
+            {cnicDigitsCount(value)}/13
+          </div>
+        </motion.div>
+      );
+    }
+    case FormFieldType.PHONE: {
+      const raw = (field.value as string) ?? "";
+
+      // Parse current value -> {dial, number}
+      const parsed = React.useMemo(() => {
+        const trimmed = raw.trim();
+
+        // Find matching dial code prefix
+        const list = props.phoneCountries?.length
+          ? props.phoneCountries
+          : COUNTRIES;
+
+        const match =
+          list
+            .slice()
+            .sort((a, b) => b.dial.length - a.dial.length)
+            .find((c) => trimmed.startsWith(c.dial)) ?? null;
+
+        if (!match)
+          return {
+            country: null as CountryPhone | null,
+            number: onlyDigits(trimmed),
+          };
+
+        const rest = trimmed.slice(match.dial.length).trim();
+        return { country: match, number: onlyDigits(rest) };
+      }, [raw, props.phoneCountries]);
+
+      const list = props.phoneCountries?.length
+        ? props.phoneCountries
+        : COUNTRIES;
+
+      // Default country only when empty
+      React.useEffect(() => {
+        if (raw && raw.trim().length > 0) return;
+        const def = guessDefaultCountry();
+        handleChange(
+          `${def.dial} ` as unknown as FieldPathValue<T, FieldPath<T>>
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+
+      const currentCountry = parsed.country ?? guessDefaultCountry();
+
+      return (
+        <motion.div
+          animate={error ? shakeAnimation : {}}
+          className={cn(
+            "flex rounded-lg border transition-all items-center w-full overflow-hidden",
+            getBorderClass()
+          )}
+        >
+          {/* Country / dial code */}
+          <div className='border-r border-primary-border bg-muted/30'>
+            <Select
+              value={currentCountry.iso2}
+              onValueChange={(iso2) => {
+                const selected =
+                  list.find((c) => c.iso2 === iso2) ?? currentCountry;
+                const next = `${selected.dial} ${parsed.number}`;
+                handleChange(next as FieldPathValue<T, FieldPath<T>>);
+              }}
+              disabled={props.disabled}
+            >
+              <SelectTrigger className='border-0 bg-transparent h-11 rounded-none'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='z-9999999999999'>
+                {list.map((c) => (
+                  <SelectItem key={c.iso2} value={c.iso2}>
+                    <div className='flex items-center justify-between gap-3 w-full'>
+                      <span className='truncate'>{c.name}</span>
+                      <span className='text-muted-foreground'>{c.dial}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Number input */}
+          <FormControl>
+            <Input
+              inputMode='tel'
+              autoComplete='tel'
+              placeholder={props.placeholder ?? "Phone number"}
+              value={parsed.number}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={(e) => {
+                const num = onlyDigits(e.target.value).slice(0, 15); // E.164 max is 15 digits
+                const next = `${currentCountry.dial} ${num}`;
+                handleChange(next as FieldPathValue<T, FieldPath<T>>);
+              }}
+              className='shad-input border-none'
+            />
+          </FormControl>
+        </motion.div>
+      );
+    }
+
     case FormFieldType.SKELETON:
       return props.renderSkelton ? props.renderSkelton(field) : null;
     default:
