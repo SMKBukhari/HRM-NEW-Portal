@@ -63,13 +63,18 @@ export const ResetPasswordSchema = z
   });
 
 export const PersonalDetailsSchema = z.object({
-  fullName: z.string().min(1, { message: "Full Name is required" }),
-  email: z.email({ message: "Invalid email address" }),
-  contactNumber: z.string().min(1, { message: "Contact Number is required" }),
-  gender: z.string().min(1, { message: "Gender is required" }),
-  dob: z.date(),
-  cnic: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().optional(),
+  fullName: z.string().min(1, { error: "Full Name is required" }),
+  email: z.email({ error: "Invalid email address" }),
+  contactNumber: z.string().min(1, { error: "Contact Number is required" }),
+  gender: z.string().min(1, { error: "Gender is required" }),
+  dob: z.date({
+    error: (iss) =>
+      iss.input === undefined
+        ? "Date of Birth is required"
+        : "Please select a valid date",
+  }),
+  cnic: z.string().min(13, { error: "CNIC is required" }),
+  address: z.string().min(5, { error: "Address is required" }),
+  city: z.string().min(3, { error: "City is required" }),
+  country: z.string().min(3, { error: "Country is required" }),
 });

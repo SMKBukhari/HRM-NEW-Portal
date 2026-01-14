@@ -181,10 +181,10 @@ const RenderInput = <T extends FieldValues>({
     if (!props.icon) return null;
     const IconComponent = props.icon;
     return (
-      <div className='flex items-center justify-center ml-2.5'>
+      <div className='flex items-center justify-center ml-2.5 '>
         <IconComponent
           className={cn(
-            "h-4 w-4 transition-colors",
+            "h-4 w-4 transition-colors ",
             error
               ? "text-red-500"
               : isFocused
@@ -226,7 +226,7 @@ const RenderInput = <T extends FieldValues>({
         <motion.div
           animate={error ? shakeAnimation : {}}
           className={cn(
-            "flex rounded-lg border transition-all items-center",
+            "flex rounded-lg border transition-all items-center bg-sidebar/50!",
             getBorderClass()
           )}
         >
@@ -263,7 +263,7 @@ const RenderInput = <T extends FieldValues>({
       return (
         <motion.div
           animate={error ? shakeAnimation : {}}
-          className='flex justify-center w-full'
+          className='flex justify-center w-full bg-sidebar/50!'
         >
           <FormControl>
             <InputOTP
@@ -298,7 +298,7 @@ const RenderInput = <T extends FieldValues>({
         <motion.div
           animate={error ? shakeAnimation : {}}
           className={cn(
-            "flex relative rounded-lg border transition-all items-center",
+            "flex relative rounded-lg border transition-all items-center bg-sidebar/50!",
             getBorderClass()
           )}
         >
@@ -350,7 +350,7 @@ const RenderInput = <T extends FieldValues>({
         <motion.div
           animate={error ? shakeAnimation : {}}
           className={cn(
-            "flex rounded-lg border transition-all",
+            "flex rounded-lg border transition-all bg-sidebar/50",
             getBorderClass()
           )}
         >
@@ -383,7 +383,7 @@ const RenderInput = <T extends FieldValues>({
     case FormFieldType.CHECKBOX:
       return (
         <FormControl>
-          <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-4 bg-sidebar/50!'>
             <Checkbox
               id={props.name}
               checked={field.value as boolean}
@@ -408,14 +408,14 @@ const RenderInput = <T extends FieldValues>({
       return (
         <motion.div
           animate={error ? shakeAnimation : {}}
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 bg-sidebar/50!'
         >
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant='outline'
                 className={cn(
-                  "w-full justify-start text-left font-normal rounded-lg border bg-transparent hover:bg-transparent h-11",
+                  "w-full justify-start text-left font-normal rounded-lg border bg-sidebar/20 hover:bg-transparent h-11",
                   getBorderClass(),
                   !current && "text-muted-foreground"
                 )}
@@ -471,14 +471,14 @@ const RenderInput = <T extends FieldValues>({
       return (
         <motion.div
           animate={error ? shakeAnimation : {}}
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 bg-sidebar/50!'
         >
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant='outline'
                 className={cn(
-                  "w-full justify-between text-left font-normal rounded-lg border bg-transparent hover:bg-transparent h-11",
+                  "w-full justify-between text-left font-normal rounded-lg border bg-sidebar/20 hover:bg-transparent h-11",
                   getBorderClass(),
                   !from && !to && "text-muted-foreground"
                 )}
@@ -532,7 +532,7 @@ const RenderInput = <T extends FieldValues>({
             >
               <SelectTrigger
                 className={cn(
-                  "rounded-lg bg-transparent! border w-full h-10!",
+                  "rounded-lg border w-full h-10! bg-sidebar/50!",
                   getBorderClass()
                 )}
               >
@@ -567,43 +567,6 @@ const RenderInput = <T extends FieldValues>({
             </Select>
           </motion.div>
         </FormControl>
-      );
-    case FormFieldType.NUMBER_INPUT:
-      return (
-        <div className='bg-brand-neutrals/5 w-32 flex items-center justify-center p-1 h-10 rounded-lg'>
-          <div
-            className='bg-white h-full flex items-center justify-center w-20 rounded-lg shadow-lg cursor-pointer text-brand-primary-blue/50'
-            onClick={() => {
-              const newValue = Math.max(1, (field.value as number) - 1);
-              handleChange(newValue as FieldPathValue<T, FieldPath<T>>);
-            }}
-          >
-            <Minus size={20} />
-          </div>
-          <FormControl>
-            <Input
-              value={field.value as number}
-              type='number'
-              onChange={(e) => {
-                const value = parseInt(e.target.value) || 1;
-                handleChange(value as FieldPathValue<T, FieldPath<T>>);
-              }}
-              onFocus={handleFocus}
-              defaultValue={props.defaultValue}
-              onBlur={handleBlur}
-              className='w-full justify-center flex items-center text-center pl-5 bg-transparent border-0 shadow-none'
-            />
-          </FormControl>
-          <div
-            className='bg-white h-full flex items-center justify-center w-20 rounded-lg shadow-lg cursor-pointer text-brand-primary-blue'
-            onClick={() => {
-              const newValue = (field.value as number) + 1;
-              handleChange(newValue as FieldPathValue<T, FieldPath<T>>);
-            }}
-          >
-            <Plus size={20} />
-          </div>
-        </div>
       );
     case FormFieldType.RADIO_GROUP: {
       const current = (field.value as string) ?? "";
@@ -641,7 +604,7 @@ const RenderInput = <T extends FieldValues>({
                       "border cursor-pointer",
                       active
                         ? "bg-primary/10 border-primary"
-                        : "border-primary-border hover:border-primary",
+                        : "border-primary-border hover:border-primary bg-sidebar/50!",
                       error && !active ? "border-primary-danger/40" : "",
                       opt.disabled && "opacity-60 cursor-not-allowed"
                     )}
@@ -687,7 +650,7 @@ const RenderInput = <T extends FieldValues>({
         <motion.div
           animate={error ? shakeAnimation : {}}
           className={cn(
-            "flex rounded-lg border transition-all items-center",
+            "flex rounded-lg border transition-all items-center bg-sidebar/50!",
             getBorderClass()
           )}
         >
@@ -763,12 +726,12 @@ const RenderInput = <T extends FieldValues>({
         <motion.div
           animate={error ? shakeAnimation : {}}
           className={cn(
-            "flex rounded-lg border transition-all items-center w-full overflow-hidden",
+            "flex rounded-lg border transition-all items-center w-full overflow-hidden bg-sidebar/50!",
             getBorderClass()
           )}
         >
           {/* Country / dial code */}
-          <div className='border-r border-primary-border bg-muted/30'>
+          <div className='bg-transparent!'>
             <Select
               value={currentCountry.iso2}
               onValueChange={(iso2) => {
@@ -779,13 +742,13 @@ const RenderInput = <T extends FieldValues>({
               }}
               disabled={props.disabled}
             >
-              <SelectTrigger className='border-0 bg-transparent h-11 rounded-none'>
+              <SelectTrigger className='border-0 bg-transparent! shadow-none! h-11 rounded-none'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className='z-9999999999999'>
                 {list.map((c) => (
                   <SelectItem key={c.iso2} value={c.iso2}>
-                    <div className='flex items-center justify-between gap-3 w-full'>
+                    <div className='flex items-center justify-between gap-2 w-full'>
                       <span className='truncate'>{c.name}</span>
                       <span className='text-muted-foreground'>{c.dial}</span>
                     </div>

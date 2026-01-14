@@ -236,15 +236,15 @@
   }
 
   .shad-input {
-    @apply placeholder:text-muted-foreground/60! md:text-base! text-sm! font-medium! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! border-0! shadow-none! transition-all;
+    @apply placeholder:text-muted-foreground/60! md:text-base! text-sm! font-medium! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! border-0! shadow-none! transition-all bg-transparent!;
   }
 
   .input {
-    @apply placeholder:text-muted-foreground/60! md:text-base! text-sm! font-medium! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! shadow-none! transition-all rounded-lg!;
+    @apply placeholder:text-muted-foreground/60! md:text-base! text-sm! font-medium! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! shadow-none! transition-all rounded-lg! bg-transparent!;
   }
 
   .shad-textArea {
-    @apply placeholder:text-muted-foreground/60! font-medium! md:text-base! text-sm! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! border-0! shadow-none! transition-all;
+    @apply placeholder:text-muted-foreground/60! font-medium! md:text-base! text-sm! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! border-0! shadow-none! bg-transparent! transition-all;
   }
 
   /* .shad-error {
@@ -252,6 +252,6 @@
   } */
 
   .textarea {
-    @apply placeholder:text-muted-foreground/60! font-medium! md:text-base! text-sm! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! shadow-none! transition-all;
+    @apply placeholder:text-muted-foreground/60! font-medium! md:text-base! text-sm! text-foreground! h-11! ring-offset-0! ring-0! focus-visible:ring-0! focus-visible:ring-offset-0! shadow-none! transition-all bg-transparent!;
   }
 }
