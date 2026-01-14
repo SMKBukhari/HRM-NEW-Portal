@@ -67,7 +67,7 @@ export const PersonalDetailsSchema = z.object({
   email: z.email({ message: "Invalid email address" }),
   contactNumber: z.string().min(1, { message: "Contact Number is required" }),
   gender: z.string().min(1, { message: "Gender is required" }),
-  dob: z.string().min(1, { message: "Date of Birth is required" }),
+  dob: z.date(),
   cnic: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),

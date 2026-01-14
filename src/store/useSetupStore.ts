@@ -30,7 +30,7 @@ export interface PersonalDetails {
   gender: string;
   city: string;
   country: string;
-  dob: string;
+  dob: Date | undefined;
   address: string;
   cnic: string;
 }
@@ -88,7 +88,7 @@ export const useSetupStore = create<SetupState>()(
         gender: "",
         city: "",
         country: "",
-        dob: "",
+        dob: undefined,
         address: "",
         cnic: "",
       },
@@ -144,7 +144,7 @@ export const useSetupStore = create<SetupState>()(
             gender: "",
             city: "",
             country: "",
-            dob: "",
+            dob: undefined,
             address: "",
             cnic: "",
           },
@@ -184,6 +184,13 @@ export const useSetupStore = create<SetupState>()(
         jobExperience: state.jobExperience,
         resumeUrl: state.resumeUrl,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const dob = state.personalDetails?.dob as any;
+        if (dob && typeof dob === "string") {
+          state.personalDetails.dob = new Date(dob);
+        }
+      },
     }
   )
 );
