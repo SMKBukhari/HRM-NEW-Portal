@@ -1,10 +1,12 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 // import { db } from "@/lib/db";
 import { prisma } from "@/lib/prisma";
-
+import dotenv from "dotenv";
+dotenv.config();
+import "dotenv/config";
 // Initialize Gemini AI
 // const genAI = new GoogleGenerativeAI("AIzaSyACThcmJesW8hVaVQ0TQBD7w7T_e70QJZg");
-const genAI = new GoogleGenerativeAI("AIzaSyBuAp4y23chf7AQgMIv5YIkf8nbV-b-SnU");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 // Professional HR-focused system prompt
 const HRM_SYSTEM_PROMPT = `
