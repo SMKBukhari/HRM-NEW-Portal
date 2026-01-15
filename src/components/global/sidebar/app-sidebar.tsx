@@ -26,6 +26,7 @@ export function AppSidebar({
     logo: "/img/logos/ttiLogo.png",
     designation: user?.designation || "User",
   };
+  const userRole = user?.role?.name || "User";
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>
@@ -47,7 +48,7 @@ export function AppSidebar({
       </SidebarHeader>
       <Separator className='mt-1.5' />
       <SidebarContent className='mt-2'>
-        <NavMain items={routes.navMain} />
+        <NavMain items={routes.navMain} userRole={userRole} />
       </SidebarContent>
       <SidebarFooter></SidebarFooter>
     </Sidebar>

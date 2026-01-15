@@ -11,8 +11,14 @@ declare global {
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
 
-  // @ts-expect-error - Type mismatch between mariadb pool and adapter expectation
-  const adapter = new PrismaMariaDb(connectionString);
+  const adapter = new PrismaMariaDb({
+    host: process.env.DATABASE_HOST,
+    port: Number(process.env.DATABASE_PORT),
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    connectionLimit: 10,
+  });
   return new PrismaClient({ adapter });
 };
 
