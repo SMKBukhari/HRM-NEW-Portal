@@ -10,7 +10,11 @@ export const uploadToCloudinary = async (
   fileBuffer: Buffer,
   fileName: string,
   folder: string = "resumes"
-): Promise<string> => {
+): Promise<{
+  secure_url: string;
+  public_id: string;
+  original_filename: string;
+}> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
@@ -27,7 +31,11 @@ export const uploadToCloudinary = async (
             return;
           }
           if (result) {
-            resolve(result.secure_url);
+            resolve({
+              secure_url: result.secure_url,
+              public_id: result.public_id,
+              original_filename: result.original_filename,
+            });
           } else {
             reject(new Error("Upload failed: No result returned"));
           }

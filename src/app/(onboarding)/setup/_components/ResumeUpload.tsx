@@ -123,6 +123,7 @@ export const ResumeUpload = () => {
     setEducation,
     setJobExperience,
     setResumeUrl,
+    setResumeFile,
   } = useSetupStore();
   const { goNext } = useProgressSteps();
 
@@ -132,6 +133,7 @@ export const ResumeUpload = () => {
       if (!file) return;
 
       setIsResumeUploading(true);
+      setResumeFile(file); // Store file for later upload
       const formData = new FormData();
       formData.append("resume", file);
 
@@ -142,7 +144,7 @@ export const ResumeUpload = () => {
           toast.success("Resume parsed successfully!");
           setPersonalDetails({
             fullName: result.data.fullName || "",
-            email: result.data.email || "",
+            // email: result.data.email || "", // Email is read-only from DB
             contactNumber: result.data.contactNumber || "",
             gender: result.data.gender || "",
             city: result.data.city || "",

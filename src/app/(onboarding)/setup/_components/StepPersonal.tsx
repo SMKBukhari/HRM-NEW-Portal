@@ -120,6 +120,7 @@ const StepPersonal = () => {
                   placeholder='Enter your email'
                   isRequired
                   fieldType={FormFieldType.INPUT}
+                  disabled
                   icon={Mail}
                 />
                 <CustomFormField

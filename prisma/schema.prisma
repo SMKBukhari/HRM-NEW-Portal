@@ -708,7 +708,7 @@ model Skills {
   userProfileId   String
   userProfile     UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
   name            String
-  experienceLevel String
+  experienceLevel String?
 
   // Relations
   ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])

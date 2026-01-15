@@ -112,8 +112,8 @@ export const JobExperienceSchema = z.object({
 });
 
 export const SkillSchema = z.object({
-  name: z.string().min(1, { error: "Skill name is required" }),
-  level: z.string().min(1, { error: "Proficiency level is required" }),
+  name: z.string().min(1, { message: "Skill name is required" }),
+  level: z.string().optional(),
 });
 
 export const SocialLinkSchema = z.object({
@@ -127,6 +127,40 @@ export const ExperienceStepSchema = z.object({
 });
 
 export const SkillsStepSchema = z.object({
-  skills: z.array(SkillSchema),
-  socialLinks: z.array(SocialLinkSchema),
+  skills: z
+    .array(SkillSchema)
+    .max(15, { message: "You can add up to 15 skills" }),
+  linkedin: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  github: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  twitter: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  facebook: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  instagram: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  behance: z
+    .string()
+    .url({ message: "Invalid URL" })
+    .optional()
+    .or(z.literal("")),
+  skype: z.string().optional(),
+  zoomId: z.string().optional(),
+  googleMeetId: z.string().optional(),
 });

@@ -53,8 +53,9 @@ const page = async () => {
     user?.country,
     user?.jobExperience?.length,
     user?.education?.length,
-    user?.resumeUrl,
   ];
+
+  console.log(requiredFieldsForApply);
 
   const userRole = user?.role?.name === "User";
   const applicantRole =

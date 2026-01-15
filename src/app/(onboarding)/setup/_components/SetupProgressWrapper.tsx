@@ -11,15 +11,20 @@ import StepSkills from "./StepSkills";
 
 export function SetupProgressWrapper({
   children,
+  userEmail,
 }: {
   children: React.ReactNode;
+  userEmail: string;
 }) {
-  const { step, setStep } = useSetupStore();
+  const { step, setStep, setPersonalDetails } = useSetupStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
-  }, []);
+    if (userEmail) {
+      setPersonalDetails({ email: userEmail });
+    }
+  }, [userEmail, setPersonalDetails]);
 
   const steps: ProgressStep[] = [
     {

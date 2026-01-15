@@ -249,6 +249,7 @@ const RenderInput = <T extends FieldValues>({
               }
               onFocus={handleFocus}
               onBlur={handleBlur}
+              disabled={props.disabled}
               defaultValue={props.defaultValue}
               className='shad-input border-none'
             />
@@ -269,6 +270,7 @@ const RenderInput = <T extends FieldValues>({
             <InputOTP
               maxLength={6}
               value={field.value as string}
+              disabled={props.disabled}
               onChange={(value) =>
                 handleChange(value as FieldPathValue<T, FieldPath<T>>)
               }
@@ -320,6 +322,7 @@ const RenderInput = <T extends FieldValues>({
               onChange={(e) =>
                 handleChange(e.target.value as FieldPathValue<T, FieldPath<T>>)
               }
+              disabled={props.disabled}
               onFocus={handleFocus}
               defaultValue={props.defaultValue}
               onBlur={handleBlur}
@@ -387,6 +390,7 @@ const RenderInput = <T extends FieldValues>({
             <Checkbox
               id={props.name}
               checked={field.value as boolean}
+              disabled={props.disabled}
               onCheckedChange={(checked) => {
                 handleChange(checked as FieldPathValue<T, FieldPath<T>>);
               }}
@@ -579,6 +583,7 @@ const RenderInput = <T extends FieldValues>({
               onValueChange={(val) =>
                 handleChange(val as FieldPathValue<T, FieldPath<T>>)
               }
+              disabled={props.disabled}
               className='flex flex-wrap gap-3'
             >
               {props.options?.map((opt) => {
@@ -661,6 +666,7 @@ const RenderInput = <T extends FieldValues>({
               autoComplete='off'
               placeholder={props.placeholder ?? "12345-1234567-1"}
               value={value}
+              disabled={props.disabled}
               onFocus={handleFocus}
               onBlur={handleBlur}
               onChange={(e) => {

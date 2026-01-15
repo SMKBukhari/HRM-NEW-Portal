@@ -3,6 +3,9 @@ import { ProgressSteps } from "@/components/global/progress-steps/ProgressSteps"
 import { SetupProgressWrapper } from "./_components/SetupProgressWrapper";
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Complete Profile | HRM Portal",
@@ -11,6 +14,49 @@ export const metadata: Metadata = {
 };
 
 export default async function SetupPage() {
+  const cookieStore = cookies();
+  const userId = (await cookieStore).get("userId")?.value;
+
+  if (!userId) {
+    redirect("/signIn");
+  }
+
+  const user = await prisma.userProfile.findUnique({
+    where: {
+      userId: userId,
+    },
+    include: {
+      jobExperience: true,
+      education: true,
+    },
+  });
+
+  if (!user) {
+    redirect("/signIn");
+  }
+
+  if (user?.isVerified === false) {
+    redirect(`/verify/${userId}`);
+  }
+
+  const requiredFieldsForApply = [
+    user?.fullName,
+    user?.email,
+    user?.contactNumber,
+    user?.city,
+    user?.country,
+    user?.jobExperience?.length,
+    user?.education?.length,
+  ];
+
+  const totalFields = requiredFieldsForApply.length;
+  const completedFields = requiredFieldsForApply.filter(Boolean).length;
+  const isComplete = requiredFieldsForApply.every(Boolean);
+
+  if (isComplete) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className='md:flex items-center justify-center md:max-h-screen min-h-screen md:h-screen md:overflow-hidden bg-sidebar lg:px-16 md:px-14 px-3 py-5'>
       <div className='md:hidden flex flex-col gap-2 mb-5 px-1 w-full'>
@@ -20,7 +66,7 @@ export default async function SetupPage() {
           International
         </p>
       </div>
-      <SetupProgressWrapper>
+      <SetupProgressWrapper userEmail={user?.email || ""}>
         <div className='bg-background md:flex lg:gap-10 md:gap-5 gap-2 w-full h-full rounded-2xl lg:p-10 md:p-8 p-5'>
           <div className='flex flex-col gap-16'>
             <div className='md:flex hidden flex-col gap-2'>

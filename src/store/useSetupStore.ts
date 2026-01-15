@@ -26,15 +26,8 @@ export interface JobExperience {
 }
 
 export interface Skill {
-  id: string;
   name: string;
-  level: string;
-}
-
-export interface SocialLink {
-  id: string;
-  platform: string;
-  url: string;
+  level?: string;
 }
 
 export interface PersonalDetails {
@@ -78,8 +71,20 @@ interface SetupState {
   education: Education[];
   jobExperience: JobExperience[];
   skills: Skill[];
-  socialLinks: SocialLink[];
+  // Social Links
+  linkedin: string;
+  github: string;
+  twitter: string;
+  facebook: string;
+  instagram: string;
+  behance: string;
+  skype: string;
+  zoomId: string;
+  googleMeetId: string;
   resumeUrl: string;
+  resumeName: string;
+  resumePublicId: string;
+  resumeFile: File | null;
   isResumeUploading: boolean;
 
   setStep: (step: number) => void;
@@ -89,8 +94,21 @@ interface SetupState {
   setEducation: (education: Education[]) => void;
   setJobExperience: (experience: JobExperience[]) => void;
   setSkills: (skills: Skill[]) => void;
-  setSocialLinks: (socialLinks: SocialLink[]) => void;
+  setSocialLinks: (
+    links: Partial<{
+      linkedin: string;
+      github: string;
+      twitter: string;
+      facebook: string;
+      instagram: string;
+      behance: string;
+      skype: string;
+      zoomId: string;
+      googleMeetId: string;
+    }>
+  ) => void;
   setResumeUrl: (url: string) => void;
+  setResumeFile: (file: File | null) => void;
   setIsResumeUploading: (isUploading: boolean) => void;
   resetStore: () => void;
 }
@@ -132,8 +150,19 @@ export const useSetupStore = create<SetupState>()(
       education: [],
       jobExperience: [],
       skills: [],
-      socialLinks: [],
+      linkedin: "",
+      github: "",
+      twitter: "",
+      facebook: "",
+      instagram: "",
+      behance: "",
+      skype: "",
+      zoomId: "",
+      googleMeetId: "",
       resumeUrl: "",
+      resumeName: "",
+      resumePublicId: "",
+      resumeFile: null,
       isResumeUploading: false,
 
       setStep: (step) => set({ step }),
@@ -152,8 +181,9 @@ export const useSetupStore = create<SetupState>()(
       setEducation: (education) => set({ education }),
       setJobExperience: (jobExperience) => set({ jobExperience }),
       setSkills: (skills) => set({ skills }),
-      setSocialLinks: (socialLinks) => set({ socialLinks }),
+      setSocialLinks: (links) => set((state) => ({ ...state, ...links })),
       setResumeUrl: (resumeUrl) => set({ resumeUrl }),
+      setResumeFile: (resumeFile) => set({ resumeFile }),
       setIsResumeUploading: (isUploading) =>
         set({ isResumeUploading: isUploading }),
       resetStore: () =>
@@ -192,8 +222,19 @@ export const useSetupStore = create<SetupState>()(
           education: [],
           jobExperience: [],
           skills: [],
-          socialLinks: [],
+          linkedin: "",
+          github: "",
+          twitter: "",
+          facebook: "",
+          instagram: "",
+          behance: "",
+          skype: "",
+          zoomId: "",
+          googleMeetId: "",
           resumeUrl: "",
+          resumeName: "",
+          resumePublicId: "",
+          resumeFile: null,
           isResumeUploading: false,
         }),
     }),
@@ -207,8 +248,19 @@ export const useSetupStore = create<SetupState>()(
         education: state.education,
         jobExperience: state.jobExperience,
         skills: state.skills,
-        socialLinks: state.socialLinks,
+        linkedin: state.linkedin,
+        github: state.github,
+        twitter: state.twitter,
+        facebook: state.facebook,
+        instagram: state.instagram,
+        behance: state.behance,
+        skype: state.skype,
+        zoomId: state.zoomId,
+        googleMeetId: state.googleMeetId,
         resumeUrl: state.resumeUrl,
+        resumeName: state.resumeName,
+        resumePublicId: state.resumePublicId,
+        // resumeFile is NOT persisted because File objects are not serializable
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
