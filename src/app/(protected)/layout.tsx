@@ -56,9 +56,12 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
       }
     >
       <AppSidebar user={user} variant='inset' />
-      <SidebarInset className='bg-background!'>
-        <SiteHeader userProfile={user} notifications={notifications} />
-        <main className='p-6 space-y-6'>{children}</main>
+      <SidebarInset className='bg-background! min-h-screen overflow-hidden scroll-smooth'>
+        <div className='h-(--header-height)'>
+          <SiteHeader userProfile={user} notifications={notifications} />
+        </div>
+
+        <main className='overflow-y-auto space-y-6 md:p-4 p-2'>{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

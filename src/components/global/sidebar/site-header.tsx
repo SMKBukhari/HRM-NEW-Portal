@@ -10,7 +10,7 @@ import BellNotification from "@/components/global/sidebar/Bell";
 import UserNavButton from "@/components/global/sidebar/user-nav";
 import ThemeToggle from "@/components/global/sidebar/ThemeToogle";
 
-import { Notifications, UserProfile } from "@prisma/client";
+import { Notifications, UserProfile } from "@/generated/prisma/client";
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@prisma/client";
+import { UserProfile } from "@/generated/prisma/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import UserPopover from "@/components/global/sidebar/UserPopover";
 import { useTheme } from "next-themes";
