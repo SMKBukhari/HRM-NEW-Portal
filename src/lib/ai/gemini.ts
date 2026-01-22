@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 // import { db } from "@/lib/db";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/db";
 import dotenv from "dotenv";
 dotenv.config();
 import "dotenv/config";
@@ -61,7 +61,7 @@ export class GeminiAIService {
 
   async generateResponse(
     userMessage: string,
-    conversationHistory: Array<{ role: string; content: string }> = []
+    conversationHistory: Array<{ role: string; content: string }> = [],
   ): Promise<string> {
     try {
       if (!this.currentUser) {
@@ -83,7 +83,7 @@ export class GeminiAIService {
       personalizedPrompt += `EMPLOYEE DATA FROM DATABASE:\n${JSON.stringify(
         userData,
         null,
-        2
+        2,
       )}\n\n`;
       personalizedPrompt += `IMPORTANT: Use the above real data from our HR database to answer questions accurately. Do not make up or invent data.\n\n`;
 
@@ -108,7 +108,7 @@ export class GeminiAIService {
     } catch (error) {
       console.error("Error generating AI response:", error);
       throw new Error(
-        "I'm having trouble accessing your HR data right now. Please try again in a moment."
+        "I'm having trouble accessing your HR data right now. Please try again in a moment.",
       );
     }
   }
@@ -421,7 +421,7 @@ export class GeminiAIService {
       suggestions.push(
         "Show my attendance for this month",
         "How to mark my attendance?",
-        "Attendance policy explanation"
+        "Attendance policy explanation",
       );
     }
 
@@ -434,7 +434,7 @@ export class GeminiAIService {
       suggestions.push(
         "Apply for leave",
         "Check my leave balance",
-        "Leave application status"
+        "Leave application status",
       );
     }
 
@@ -447,7 +447,7 @@ export class GeminiAIService {
       suggestions.push(
         "My contract end date",
         "Contract renewal process",
-        "Employment terms"
+        "Employment terms",
       );
     }
 
@@ -460,7 +460,7 @@ export class GeminiAIService {
       suggestions.push(
         "Salary slip for last month",
         "Payroll schedule",
-        "Deduction details"
+        "Deduction details",
       );
     }
 
@@ -473,7 +473,7 @@ export class GeminiAIService {
       suggestions.push(
         "My performance review schedule",
         "Performance feedback",
-        "Goal setting process"
+        "Goal setting process",
       );
     }
 
@@ -482,7 +482,7 @@ export class GeminiAIService {
       suggestions.push(
         "My current work schedule",
         "Upcoming public holidays",
-        "Team meeting schedule"
+        "Team meeting schedule",
       );
     }
 

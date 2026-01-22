@@ -1,7 +1,6 @@
-// import { db } from "@/lib/db";
+import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
 import OTPInput from "./_components/otpInput";
-import { prisma } from "@/lib/prisma";
 
 const VerifyAccount = async (props: {
   params: Promise<{ userId: string }>;

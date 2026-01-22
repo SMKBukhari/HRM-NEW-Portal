@@ -1,24 +1,12 @@
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SimpleUser } from "@/types/types";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import {
-  IconBrandBehance,
-  IconBrandFacebook,
-  IconBrandGithub,
-  IconBrandInstagram,
-  IconBrandLinkedin,
-  IconBrandMeetup,
-  IconBrandSkype,
-  IconBrandTwitter,
-  IconBrandZoom,
-} from "@tabler/icons-react";
 import { Dock, DockIcon } from "@/components/global/badtzui/dock";
+import prisma from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Profile | HRM Portal",
@@ -73,7 +61,14 @@ export default async function ProfilePage() {
     return `${baseUrl}/notionists/svg?seed=${seed}`;
   };
 
-  const avatarFallback = user?.fullName?.substring(0, 2).toUpperCase();
+  const isSocialMedia =
+    user?.skype ||
+    user?.linkedIn ||
+    user?.github ||
+    user?.twitter ||
+    user?.instagram ||
+    user?.googleMeetId ||
+    user?.zoomId;
 
   return (
     <div className='w-full h-full'>
@@ -121,116 +116,108 @@ export default async function ProfilePage() {
                 </p>
               </div>
             </div>
-            <div className='flex flex-wrap gap-2 items-center justify-between w-full'>
+            <div className='flex flex-wrap gap-1.5 items-center justify-between w-full'>
               <p className='text-sm font-bold text-muted-foreground'>
                 Social Media
               </p>
-              <div className='flex items-center gap-2'>
-                <Dock>
+              {isSocialMedia ? (
+                <Dock iconSize={35}>
+                  <DockIcon
+                    name='Skype'
+                    href={user.skype || "#"}
+                    src='/img/logos/Skype.png'
+                  />
                   {user.skype && (
-                    <DockIcon name='Skype' href={user.skype}>
-                      <IconBrandSkype />
-                    </DockIcon>
+                    <DockIcon
+                      name='Skype'
+                      href={user.skype}
+                      src='/img/logos/Skype.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='LinkedIn'
+                    href={user.linkedIn || "#"}
+                    src='/img/logos/LinkedIn.png'
+                  />
                   {user.linkedIn && (
-                    <DockIcon name='LinkedIn' href={user.linkedIn}>
-                      <IconBrandLinkedin />
-                    </DockIcon>
+                    <DockIcon
+                      name='LinkedIn'
+                      href={user.linkedIn}
+                      src='/img/logos/LinkedIn.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='GitHub'
+                    href={user.github || "#"}
+                    src='/img/logos/GitHub.png'
+                  />
                   {user.github && (
-                    <DockIcon name='GitHub' href={user.github}>
-                      <IconBrandGithub />
-                    </DockIcon>
+                    <DockIcon
+                      name='GitHub'
+                      href={user.github}
+                      src='/img/logos/GitHub.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='Twitter'
+                    href={user.twitter || "#"}
+                    src='/img/logos/Twitterx.png'
+                  />
                   {user.twitter && (
-                    <DockIcon name='Twitter' href={user.twitter}>
-                      <IconBrandTwitter />
-                    </DockIcon>
+                    <DockIcon
+                      name='Twitter'
+                      href={user.twitter}
+                      src='/img/logos/Twitterx.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='Instagram'
+                    href={user.instagram || "#"}
+                    src='/img/logos/Instagram.png'
+                  />
                   {user.instagram && (
-                    <DockIcon name='Instagram' href={user.instagram}>
-                      <IconBrandInstagram />
-                    </DockIcon>
+                    <DockIcon
+                      name='Instagram'
+                      href={user.instagram}
+                      src='/img/logos/Instagram.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='Facebook'
+                    href={user.facebook || "#"}
+                    src='/img/logos/Facebook.png'
+                  />
                   {user.facebook && (
-                    <DockIcon name='Facebook' href={user.facebook}>
-                      <IconBrandFacebook />
-                    </DockIcon>
+                    <DockIcon
+                      name='Facebook'
+                      href={user.facebook}
+                      src='/img/logos/Facebook.png'
+                    />
                   )}
 
+                  <DockIcon
+                    name='Zoom'
+                    href={user.zoomId || "#"}
+                    src='/img/logos/Zoom.png'
+                  />
                   {user.zoomId && (
-                    <DockIcon name='Zoom' href={user.zoomId}>
-                      <IconBrandZoom />
-                    </DockIcon>
+                    <DockIcon
+                      name='Zoom'
+                      href={user.zoomId}
+                      src='/img/logos/Zoom.png'
+                    />
                   )}
                 </Dock>
-                <div className='bg-background rounded-lg p-2 flex items-center gap-2'>
-                  <IconBrandSkype className='h-5 w-5' />
-                </div>
-                <div className='bg-background rounded-lg p-2 flex items-center gap-2'>
-                  <IconBrandLinkedin className='h-5 w-5' />
-                </div>
-
-                {user.skype && (
-                  <Badge variant='outline'>
-                    <IconBrandSkype className='h-4 w-4' />
-                    {user.skype}
-                  </Badge>
-                )}
-                {user.linkedIn && (
-                  <Badge variant='outline'>
-                    <IconBrandLinkedin className='h-4 w-4' />
-                    {user.linkedIn}
-                  </Badge>
-                )}
-                {user.github && (
-                  <Badge variant='outline'>
-                    <IconBrandGithub className='h-4 w-4' />
-                    {user.github}
-                  </Badge>
-                )}
-                {user.twitter && (
-                  <Badge variant='outline'>
-                    <IconBrandTwitter className='h-4 w-4' />
-                    {user.twitter}
-                  </Badge>
-                )}
-                {user.facebook && (
-                  <Badge variant='outline'>
-                    <IconBrandFacebook className='h-4 w-4' />
-                    {user.facebook}
-                  </Badge>
-                )}
-                {user.instagram && (
-                  <Badge variant='outline'>
-                    <IconBrandInstagram className='h-4 w-4' />
-                    {user.instagram}
-                  </Badge>
-                )}
-                {user.behance && (
-                  <Badge variant='outline'>
-                    <IconBrandBehance className='h-4 w-4' />
-                    {user.behance}
-                  </Badge>
-                )}
-                {user.zoomId && (
-                  <Badge variant='outline'>
-                    <IconBrandZoom className='h-4 w-4' />
-                    {user.zoomId}
-                  </Badge>
-                )}
-                {user.googleMeetId && (
-                  <Badge variant='outline'>
-                    <IconBrandMeetup className='h-4 w-4' />
-                    {user.googleMeetId}
-                  </Badge>
-                )}
-              </div>
+              ) : (
+                <p className='text-xs font-bold text-muted-foreground text-center w-full'>
+                  No Social Media Links Found
+                </p>
+              )}
             </div>
           </div>
         </div>

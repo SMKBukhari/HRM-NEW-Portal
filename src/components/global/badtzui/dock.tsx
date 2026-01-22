@@ -164,10 +164,15 @@ export function Dock({
   };
 
   return (
-    <nav ref={dockRef} role='navigation' aria-label='Main Dock'>
+    <nav
+      ref={dockRef}
+      role='navigation'
+      aria-label='Main Dock'
+      className='w-full text-center '
+    >
       <ul
         className={cn(
-          "flex items-center rounded-xl border border-gray-100 bg-linear-to-t from-neutral-50 to-white p-1 dark:border-zinc-900 dark:from-zinc-950 dark:to-zinc-900",
+          "flex items-center justify-center rounded-xl border border-gray-100 bg-linear-to-t from-neutral-50 to-white p-1 dark:border-zinc-900 dark:from-zinc-950 dark:to-zinc-900",
           className,
         )}
       >

@@ -1,5 +1,4 @@
-// import { db } from "@/lib/db";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";

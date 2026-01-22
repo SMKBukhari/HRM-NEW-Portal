@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Complete Profile | HRM Portal",
