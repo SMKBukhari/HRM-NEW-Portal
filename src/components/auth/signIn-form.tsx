@@ -71,7 +71,7 @@ const LoginForm = ({ redirectTo }: { redirectTo?: string }) => {
         } else {
           router.push(`/verify/${response.data.userId}`);
           toast.success(
-            "User SignedIn successfully, Please Verify Your Email."
+            "User SignedIn successfully, Please Verify Your Email.",
           );
         }
       }
@@ -122,7 +122,7 @@ const LoginForm = ({ redirectTo }: { redirectTo?: string }) => {
             />
           </div>
 
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between gap-8'>
             <div className='flex items-center space-x-2'>
               <Checkbox
                 id='remember'
@@ -131,7 +131,7 @@ const LoginForm = ({ redirectTo }: { redirectTo?: string }) => {
               />
               <label
                 htmlFor='remember'
-                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                className='md:text-sm text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
               >
                 Keep me logged in
               </label>
@@ -157,7 +157,7 @@ const LoginForm = ({ redirectTo }: { redirectTo?: string }) => {
               <Separator />
             </div>
             <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-white px-2 text-muted-foreground'>OR</span>
+              <span className='px-2 text-muted-foreground bg-card'>OR</span>
             </div>
           </div>
         </form>

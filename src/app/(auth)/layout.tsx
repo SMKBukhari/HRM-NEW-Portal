@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className='w-full h-screen p-4 flex items-center justify-center'>
+    <main className='w-full h-screen md:p-4 p-0.5 flex items-center justify-center'>
       <div className='w-full h-full max-w-screen flex overflow-hidden'>
         {/* Left Side - Form */}
         <div className='w-full lg:w-1/2 h-full flex flex-col relative justify-center items-center p-2'>

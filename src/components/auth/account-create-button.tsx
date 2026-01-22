@@ -15,7 +15,7 @@ export const CreateAccount = ({
   href,
 }: CreateAccountProps) => {
   return (
-    <div className='flex w-full justify-center items-center -mt-1.5'>
+    <div className='flex w-full justify-center items-center -mt-1.5 md:flex-row flex-col '>
       <span className='md:text-sm text-xs font-normal text-muted-foreground'>
         {spanLabel}
       </span>

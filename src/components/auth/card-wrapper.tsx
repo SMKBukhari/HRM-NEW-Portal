@@ -45,7 +45,7 @@ export const CardWrapper = ({
       className={cn(
         "w-full",
         isShadow ? "shadow-md border" : "shadow-none border-none",
-        className
+        className,
       )}
     >
       <CardHeader className='flex flex-col items-center gap-2'>
